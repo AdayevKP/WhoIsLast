@@ -1,5 +1,6 @@
 package com.whoslast.controllers;
 
+import com.whoslast.authorization.CredentialsManager;
 import com.whoslast.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -13,32 +14,44 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @EnableJpaRepositories
 @RequestMapping(path = "/test") // URL beginning
 public class MainController {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private LiveQueueRepository liveQueueRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+    private QueueRepository queueRepository;
 
 
-    // @ResponseBody means the returned String is the response, not a view name
-    // @RequestParam means it is a parameter from the GET or POST request
-    @GetMapping(path = "/add") // Map ONLY GET Requests
-    public @ResponseBody
-    String addNewUser(@RequestParam String name
-            , @RequestParam String email, @RequestParam String password) {
+	// @ResponseBody means the returned String is the response, not a view name
+	// @RequestParam means it is a parameter from the GET or POST request
+    @GetMapping(path="/add") // Map ONLY GET Requests
+    public @ResponseBody String addNewUser (@RequestParam String name
+            , @RequestParam String email, @RequestParam String password, @RequestParam String partyId) {
 
-        User n = new User();
-        n.setName(name);
-        n.setEmail(email);
-        n.setPassword(password);
-        userRepository.save(n);
-        return "Saved";
+        try {
+            CredentialsManager.Credentials myCred = CredentialsManager.buildCredentials(password);
+            String salt = myCred.getSalt();
+            String hash = myCred.getHash();
+            int hashsize = myCred.getHashSize();
+            User n = new User();
+            n.setName(name);
+            n.setEmail(email);
+            n.setSalt(salt);
+            n.setHash(hash);
+            n.setHashsize(hashsize);
+            userRepository.save(n);
+            return "Saved";
+        }
+        catch (Exception e){
+            System.out.println("Problems with password\n");
+        }
+        return "Problems with registration";
     }
-	/*
-	@GetMapping(path="/all")
-	public @ResponseBody Iterable<User> getAllUsers() {
+	
+	@GetMapping(path="/all_json")
+	public @ResponseBody Iterable<User> getAllUsersJson() {
 		// returns JSON with all users
 		return userRepository.findAll();
-	}*/
+	}
 
     @GetMapping(path = "/all")
     public String getAllUsers() {
@@ -53,5 +66,4 @@ public class MainController {
         System.out.println("signing in");
         return "sign_in";
     }
-
 }

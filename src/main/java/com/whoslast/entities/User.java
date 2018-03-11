@@ -10,20 +10,50 @@ import javax.persistence.Id;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Integer userId;
 
-    private String password;
+    private String salt;
+
+    private String hash;
+
+    private Integer hashsize;
 
     private String name;
 
     private String email;
 
-    public Integer getId() {
-        return id;
+    private Integer partyId;
+
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public Integer getHashsize(){
+        return hashsize;
+    }
+
+    public void setHashsize(Integer hashsize){
+        this.hashsize = hashsize;
     }
 
     public String getName() {
@@ -42,13 +72,15 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public Integer getPartyId(){
+        return partyId;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setGroupId(Integer partyId){
+        this.partyId = partyId;
     }
+
+
 
 }
 
