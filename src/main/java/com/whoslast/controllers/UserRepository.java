@@ -13,4 +13,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Query(value = "SELECT * FROM user WHERE name LIKE ?1", nativeQuery = true)
     User findUserByNameStartingWith(String name);
 
+    //Get user tuple by email
+    @Query(value = "SELECT * FROM user WHERE email=?1", nativeQuery = true)
+    User findUserByEmail(String email);
 }
