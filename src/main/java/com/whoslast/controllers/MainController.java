@@ -35,6 +35,14 @@ public class MainController {
         AuthResponse response = signUpManager.signUp(signUpData);
         return response.toString();
     }
+
+    @GetMapping(path = "/sign_in")
+    public @ResponseBody String signIn(@RequestParam String email, @RequestParam String password) {
+        SignInManager signInManager = new SignInManager(userRepository);
+        SignInManager.UserSignInData signInData = new SignInManager.UserSignInData(email, password);
+        AuthResponse response = signInManager.signIn(signInData);
+        return response.toString();
+    }
 	
 	@GetMapping(path="/all_json")
 	public @ResponseBody Iterable<User> getAllUsersJson() {
