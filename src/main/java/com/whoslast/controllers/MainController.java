@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Controller
 @EnableJpaRepositories
 @RequestMapping(path = "/test") // URL beginning
@@ -48,15 +50,17 @@ public class MainController {
 	}
 
     @GetMapping(path = "/all")
-    public String getAllUsers() {
+    public String getAllUsers(Map<String, Object> model) {
         // returns JSON with all users
+        //model.put("msg", "testMsg");
         System.out.println("showing all users");
-        return "index";
+        return "check_in";
     }
-    /*
+
     @GetMapping(path = "/users/{id}")
-    public @ResponseBody User singleUser(@PathVariable Integer id){
-        User user = userRepository.findOne(Long.valueOf(id));
-        return  userRepository.findOne(Long.valueOf(id));
-    }*/
+    public @ResponseBody
+    Iterable<User> singleUser(@PathVariable Integer id){
+        Iterable<User> user = userRepository.findUserById(id);
+        return  user;
+    }
 }

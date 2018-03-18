@@ -16,4 +16,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
     //Get user tuple by email
     @Query(value = "SELECT * FROM users WHERE email=?1", nativeQuery = true)
     User findUserByEmail(String email);
+
+    @Query(value = "SELECT * FROM users WHERE user_id=?1", nativeQuery = true)
+    Iterable<User> findUserById(Integer id);
+
 }
