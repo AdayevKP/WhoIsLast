@@ -53,4 +53,10 @@ public class MainController {
         System.out.println("showing all users");
         return "index";
     }
+    /*
+    @GetMapping(path = "/users/{id}")
+    public @ResponseBody User singleUser(@PathVariable Integer id){
+        User user = userRepository.findOne(Long.valueOf(id));
+        return  userRepository.findOne(Long.valueOf(id));
+    }*/
 }
