@@ -10,12 +10,14 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 
-@SpringBootApplication(scanBasePackageClasses = {GroupQueueRepository.class,
-        GroupRepository.class, MainController.class,
+@SpringBootApplication(scanBasePackageClasses = {PartyQueueRepository.class,
+        PartyRepository.class, MainController.class,
         QueueRepository.class, UserQueueRepository.class,
         UserRepository.class, Party.class,
         PartyQueue.class, Queue.class,
-        User.class, UserQueue.class})
+        User.class, QueueRecord.class,
+        RequestRepository.class, SuperuserRepository.class,
+        Request.class, Superuser.class})
 @ComponentScan(basePackages = {"com"})
 @EntityScan(basePackages = {"com"})
 @EnableJpaAuditing

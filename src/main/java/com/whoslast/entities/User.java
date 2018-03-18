@@ -1,12 +1,10 @@
 package com.whoslast.entities;
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity // This tells Hibernate to make a table out of this class
+@Table(name = "Users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,7 +20,9 @@ public class User {
 
     private String email;
 
-    private Integer partyId;
+    @ManyToOne
+    @JoinColumn(name="partyId")
+    private Party party;
 
     public Integer getUserId() {
         return userId;
@@ -72,15 +72,13 @@ public class User {
         this.email = email;
     }
 
-    public Integer getPartyId(){
-        return partyId;
+    public Party getPartyId(){
+        return party;
     }
 
-    public void setGroupId(Integer partyId){
-        this.partyId = partyId;
+    public void setGroupId(Party party){
+        this.party = party;
     }
-
-
 
 }
 

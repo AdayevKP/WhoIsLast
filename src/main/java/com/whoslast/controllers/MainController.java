@@ -22,7 +22,7 @@ public class MainController {
 	@Autowired
     private QueueRepository queueRepository;
 	@Autowired
-    private GroupRepository groupRepository;
+    private PartyRepository partyRepository;
 
 
 	// @ResponseBody means the returned String is the response, not a view name

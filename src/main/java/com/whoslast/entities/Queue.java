@@ -1,10 +1,8 @@
 package com.whoslast.entities;
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 public class Queue {
@@ -15,7 +13,8 @@ public class Queue {
 
     private Integer host;
 
-    private String time;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date time;
 
     private String place;
 
@@ -33,11 +32,11 @@ public class Queue {
         return host;
     }
 
-    public void setTime(String time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 
-    public String getTime() {
+    public Date getTime() {
         return time;
     }
 

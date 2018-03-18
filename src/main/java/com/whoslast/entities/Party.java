@@ -1,10 +1,7 @@
 package com.whoslast.entities;
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity // This tells Hibernate to make a table out of this class
 public class Party {
@@ -12,27 +9,29 @@ public class Party {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer partyId;
 
-    private Integer superuser;
+    @OneToOne
+    @JoinColumn(name="superuser_id")
+    private Superuser superuser;
 
-    private String speciality;
+    private String name;
 
     public Integer getPartyId() {
         return partyId;
     }
 
-    public void setSuperuser(Integer superuser) {
+    public void setSuperuser(Superuser superuser) {
         this.superuser = superuser;
     }
 
-    public Integer getSuperuser() {
+    public Superuser getSuperuser() {
         return superuser;
     }
 
-    public void setSpeciality(String speciality) {
-        this.speciality = speciality;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getSpeciality() {
-        return speciality;
+        return name;
     }
 }

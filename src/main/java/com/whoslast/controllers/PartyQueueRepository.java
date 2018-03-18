@@ -5,5 +5,5 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface GroupQueueRepository extends CrudRepository<PartyQueue, Long>{
+public interface PartyQueueRepository extends CrudRepository<PartyQueue, Long>{
 }

@@ -1,10 +1,7 @@
 package com.whoslast.entities;
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 
 @Entity // This tells Hibernate to make a table out of this class
@@ -13,27 +10,31 @@ public class PartyQueue {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer recordId;
 
-    private Integer queueId;
+    @ManyToOne
+    @JoinColumn(name="queueId")
+    private Queue queue;
 
-    private Integer partyId;
+    @ManyToOne
+    @JoinColumn(name="partyId")
+    private Party party;
 
     public Integer getRecordId() {
         return recordId;
     }
 
-    public void setQueueId(Integer queueId) {
-        this.queueId = queueId;
+    public void setQueue(Queue queue) {
+        this.queue = queue;
     }
 
-    public Integer getQueueId() {
-        return queueId;
+    public Queue getQueueId() {
+        return queue;
     }
 
-    public void setPartyId(Integer partyId) {
-        this.partyId = partyId;
+    public void setPartyId(Party party) {
+        this.party = party;
     }
 
-    public Integer getPartyId() {
-        return partyId;
+    public Party getPartyId() {
+        return party;
     }
 }
