@@ -57,10 +57,16 @@ public class MainController {
         return "index";
     }
 
-    @GetMapping(path = "/users/{id}")
+
+    @GetMapping(path = "/users_json/{id}")
     public @ResponseBody
     Iterable<User> singleUser(@PathVariable Integer id){
-        Iterable<User> user = userRepository.findUserById(id);
-        return  user;
+        return userRepository.findUserById(id);
+    }
+
+    @GetMapping(path = "/group")
+    public String CreateGroup() {
+
+        return "create_group";
     }
 }
