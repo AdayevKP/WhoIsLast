@@ -10,10 +10,13 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends CrudRepository<User, Long> {
 
     //example of custom sql query
-    @Query(value = "SELECT * FROM user WHERE name LIKE ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM users WHERE name LIKE ?1", nativeQuery = true)
     User findUserByNameStartingWith(String name);
 
     //Get user tuple by email
-    @Query(value = "SELECT * FROM user WHERE email=?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM users WHERE email=?1", nativeQuery = true)
     User findUserByEmail(String email);
+
+    @Query(value = "SELECT * FROM users WHERE id = ?1", nativeQuery = true)
+    User findUserById(Integer id);
 }

@@ -75,7 +75,7 @@ public class SignInManager extends AuthManager {
         if (user == null)
             throw new SignInException(msgSignInErrorCredentials);
         else
-            credentials = new CredentialsManager.Credentials(user.getHash(), user.getSalt(), user.getHashsize());
+            credentials = new CredentialsManager.Credentials(user.getHash(), user.getSalt(), user.getHashSize());
         return credentials;
     }
 
