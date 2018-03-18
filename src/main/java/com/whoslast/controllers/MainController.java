@@ -54,7 +54,7 @@ public class MainController {
         // returns JSON with all users
         //model.put("msg", "testMsg");
         System.out.println("showing all users");
-        return "check_in";
+        return "index";
     }
 
     @GetMapping(path = "/users/{id}")
