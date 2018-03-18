@@ -84,7 +84,7 @@ public class SignUpManager extends AuthManager {
 
         newDatabaseUser.setName(signUpData.getName());
         newDatabaseUser.setEmail(signUpData.getEmail());
-        newDatabaseUser.setGroupId(initialPartyId);
+        //newDatabaseUser.setGroupId(initialPartyId);
         newDatabaseUser.setSalt(credentials.getSalt());
         newDatabaseUser.setHash(credentials.getHash());
         newDatabaseUser.setHashsize(credentials.getHashSize());
