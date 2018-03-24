@@ -4,13 +4,13 @@ import com.whoslast.authorization.AuthResponse;
 import com.whoslast.authorization.SignInManager;
 import com.whoslast.authorization.SignUpManager;
 import com.whoslast.entities.User;
+import com.whoslast.group.GroupManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Controller
 @EnableJpaRepositories
@@ -23,6 +23,8 @@ public class MainController {
     private QueueRepository queueRepository;
 	@Autowired
     private PartyRepository partyRepository;
+    @Autowired
+    private SuperuserRepository suRepository;
 
 
 	// @ResponseBody means the returned String is the response, not a view name
@@ -51,9 +53,34 @@ public class MainController {
 	}
 
     @GetMapping(path = "/all")
-    public String getAllUsers() {
+    public String getAllUsers(Map<String, Object> model) {
         // returns JSON with all users
+        //model.put("msg", "testMsg");
         System.out.println("showing all users");
         return "index";
+    }
+
+    @RequestMapping(path = "/groups")
+    public @ResponseBody String addNewGroup(@RequestParam String email, @RequestParam String password, @RequestParam String grName){
+        SignInManager signInManager = new SignInManager(userRepository);
+        SignInManager.UserSignInData signInData = new SignInManager.UserSignInData(email, password);
+        AuthResponse AuthResponse = signInManager.signIn(signInData);
+        AuthResponse groupResponse;
+
+        if(AuthResponse.isSuccess()){
+            GroupManager groupManager = new GroupManager(partyRepository, userRepository, suRepository);
+            groupResponse = groupManager.NewGroup(email, grName);
+        }
+        else{
+            return AuthResponse.toString();
+        }
+        return groupResponse.toString();
+    }
+
+    @GetMapping(path = "/users/{id}")
+    public @ResponseBody
+    Iterable<User> singleUser(@PathVariable Integer id){
+        Iterable<User> user = userRepository.findUserById(id);
+        return  user;
     }
 }

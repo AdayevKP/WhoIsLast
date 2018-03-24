@@ -14,7 +14,7 @@ public class User {
 
     private String hash;
 
-    private Integer hashsize;
+    private Integer hashSize;
 
     private String name;
 
@@ -48,12 +48,12 @@ public class User {
         this.hash = hash;
     }
 
-    public Integer getHashsize(){
-        return hashsize;
+    public Integer getHashSize(){
+        return hashSize;
     }
 
-    public void setHashsize(Integer hashsize){
-        this.hashsize = hashsize;
+    public void setHashSize(Integer hashsize){
+        this.hashSize = hashsize;
     }
 
     public String getName() {

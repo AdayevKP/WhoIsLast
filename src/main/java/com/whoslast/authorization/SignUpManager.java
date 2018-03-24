@@ -52,8 +52,8 @@ public class SignUpManager extends AuthManager {
          */
         public boolean hasEmptyFields() {
             return this.email.isEmpty() || this.name.isEmpty() || this.password.isEmpty();
-        }
-    }
+
+        }        }
 
     private static final String msgSignUpSuccess = "Successful sign up";
     private static final String msgSignUpErrorEmptyFields = "Some of provided fields are empty";
@@ -84,10 +84,10 @@ public class SignUpManager extends AuthManager {
 
         newDatabaseUser.setName(signUpData.getName());
         newDatabaseUser.setEmail(signUpData.getEmail());
-        //newDatabaseUser.setGroupId(initialPartyId);
+        //newDatabaseUser.setGroupId(null);
         newDatabaseUser.setSalt(credentials.getSalt());
         newDatabaseUser.setHash(credentials.getHash());
-        newDatabaseUser.setHashsize(credentials.getHashSize());
+        newDatabaseUser.setHashSize(credentials.getHashSize());
 
         return  newDatabaseUser;
     }
