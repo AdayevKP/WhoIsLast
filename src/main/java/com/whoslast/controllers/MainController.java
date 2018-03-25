@@ -88,7 +88,6 @@ public class MainController {
 
     @GetMapping(path = "/all")
     public String getAllUsers() {
-        System.out.println("showing all users");
         return "index";
     }
 
