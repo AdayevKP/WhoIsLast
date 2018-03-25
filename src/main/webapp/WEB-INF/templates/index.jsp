@@ -1,6 +1,6 @@
-<!doctype html>
-<!--START PAGE-->
-<html class="no-js" lang="" xmlns:th="http://www.thymeleaf.org"> <!--<![endif]-->
+
+
+<html class="no-js"> <!--<![endif]-->
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -47,6 +47,7 @@
 
       <div class="starter-template">
         <h1>Иванов Иван Иванович</h1>
+          <h1>${msg}</h1>
           <!--<span th:text="'Message: ' + ${msg}"></span>-->
         <!--p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p-->
       </div>
