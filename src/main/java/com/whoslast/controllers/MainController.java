@@ -99,12 +99,12 @@ public class MainController {
     }
 
 
-    @RequestMapping(path = "/groups", method = RequestMethod.GET)
+    @RequestMapping(path = "/new_group", method = RequestMethod.GET)
     public String addNewGroupGet() {
         return "create_group";
     }
 
-    @RequestMapping(path = "/groups", method = RequestMethod.POST)
+    @RequestMapping(path = "/new_group", method = RequestMethod.POST)
     public String addNewGroup(@RequestParam(value = "inputEmail", required = true) String email,
                               @RequestParam(value = "inputPassword", required = true) String password,
                               @RequestParam(value = "inputName", required = true) String grName) {
