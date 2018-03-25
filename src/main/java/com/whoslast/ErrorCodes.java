@@ -11,4 +11,11 @@ public class ErrorCodes {
         public static final int BAD_PASSWORD = 14;
         public static final int WRONG_CREDENTIALS = 15;
     }
+
+    public static class Groups {
+        public static final int YOU_ALREADY_IN_GROUP = 16;
+        public static final int GROUP_WITH_THIS_NAME_ALREADY_EXISTS = 17;
+        public static final int YOU_ALREADY_HAVE_YOUR_OWN_GROUP = 18;
+
+    }
 }
