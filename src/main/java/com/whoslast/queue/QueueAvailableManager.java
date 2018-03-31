@@ -1,5 +1,6 @@
 package com.whoslast.queue;
 
+import com.whoslast.controllers.PartyRepository;
 import com.whoslast.controllers.QueueRepository;
 import com.whoslast.controllers.UserRepository;
 import com.whoslast.entities.Party;
@@ -17,29 +18,38 @@ import java.util.List;
  * Get queues available to user
  */
 public class QueueAvailableManager {
+    public enum QueueAvailableMode {
+        BY_USER,
+        BY_PARTYID
+    }
+
     /**
      * Data provided by request generator to get available queues
      */
     public static class QueueAvailableData {
-        private String email;
+        private String argument;
+        QueueAvailableMode mode;
 
-        public QueueAvailableData(String email) {
-            this.email = email;
+        public QueueAvailableData(String argument, QueueAvailableMode mode) {
+            this.argument = argument;
+            this.mode = mode;
         }
 
         public void setEmail(String email) {
-            this.email = email;
+            this.argument = email;
         }
 
-        public String getEmail() {
-            return email;
-        }
+        public String getEmail() { return mode == QueueAvailableMode.BY_USER ? argument : "BAD_MODE"; }
+
+        public String getPartyId() { return mode == QueueAvailableMode.BY_PARTYID ? argument : "BAD_MODE"; }
+
+        public boolean isByUserMode() { return mode == QueueAvailableMode.BY_USER; }
 
         /**
          * Is there any empty fields (empty strings)?
          * @return True -- there are empty strings, False -- there aren't any
          */
-        public boolean hasEmptyFields() { return this.email.isEmpty() ; }
+        public boolean hasEmptyFields() { return this.argument.isEmpty() ; }
     }
 
     /**
@@ -98,12 +108,15 @@ public class QueueAvailableManager {
     private static final String msgQueueAvailableEmptyFields = "Some of provided fields were empty";
     private static final String msgQueueAvailableErrorBadUser = "User with such an email does not exist";
     private static final String msgQueueAvailableErrorNoGroup = "The user is not in a group";
+    private static final String msgQueueAvailableErrorNoParty = "The party with such an id does not exist";
 
     private UserRepository userDatabase;
+    private PartyRepository partyDatabase;
     private QueueRepository queueDatabase;
 
-    public QueueAvailableManager(UserRepository userDatabase, QueueRepository queueDatabase) {
+    public QueueAvailableManager(UserRepository userDatabase, PartyRepository partyDatabase, QueueRepository queueDatabase) {
         this.userDatabase = userDatabase;
+        this.partyDatabase = partyDatabase;
         this.queueDatabase = queueDatabase;
     }
 
@@ -116,13 +129,48 @@ public class QueueAvailableManager {
         ServerResponse response;
         try {
             analyzeInputData(queueAvailableData);
-            User user = getUserByEmail(queueAvailableData.getEmail());
-            QueueAvailableList queues = getUserQueues(user);
+            QueueAvailableList queues;
+            if (queueAvailableData.isByUserMode()) {
+                User user = getUserByEmail(queueAvailableData.getEmail());
+                queues = getUserQueues(user);
+            } else {
+                Integer partyId = parsePartyId(queueAvailableData);
+                queues = getPartyQueues(partyId);
+            }
             response = new ServerResponse(msgQueueAvailableSuccess, ErrorCodes.NO_ERROR, queues);
         } catch (QueueAvailableException e) {
             response = new ServerResponse(e.getMessage(), e.errorCode);
         }
         return response;
+    }
+
+    /**
+     * Get queues available for the group
+     * @param partyId Party identifier
+     * @return List of available queues
+     * @throws QueueAvailableException
+     */
+    private QueueAvailableList getPartyQueues(Integer partyId) throws QueueAvailableException {
+        if (partyDatabase.checkExistenceOfParty(partyId) == 0)
+            throw new QueueAvailableException(msgQueueAvailableErrorNoParty, ErrorCodes.Groups.GROUP_DOES_NOT_EXIST);
+        Iterable<Queue> queues = queueDatabase.getQueuesEntriesByPartyId(partyId);
+        return new QueueAvailableList(queues);
+    }
+
+    /**
+     * Parse string in input data for party id
+     * @param queueAvailableData Data provided by user
+     * @return Party identifier
+     * @throws QueueAvailableException
+     */
+    private Integer parsePartyId(QueueAvailableData queueAvailableData) throws QueueAvailableException {
+        Integer num;
+        try {
+            num = Integer.parseInt(queueAvailableData.getPartyId());
+        } catch (NumberFormatException e) {
+            throw new QueueAvailableException(msgQueueAvailableErrorNoParty, ErrorCodes.Groups.GROUP_DOES_NOT_EXIST);
+        }
+        return num;
     }
 
     /**
@@ -145,7 +193,7 @@ public class QueueAvailableManager {
      */
     private QueueAvailableList getUserQueues(User user) throws QueueAvailableException {
         Party party = getPartyOfUser(user);
-        Iterable<Queue> queues = queueDatabase.getQueuesEntriesByPartyId(party.getPartyId());
+        Iterable<Queue> queues = queueDatabase.getQueuesEntriesAvailableToUser(party.getPartyId(), user.getUserId());
         return new QueueAvailableList(queues);
     }
 

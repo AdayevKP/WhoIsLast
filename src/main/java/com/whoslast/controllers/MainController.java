@@ -116,18 +116,36 @@ public class MainController {
         return response.toString();
     }
 
-    @GetMapping(path = "/available_queues")
+    @GetMapping(path = "/available_user_queues")
     public @ResponseBody
-    String getAvailableQueues(@RequestParam String email, @RequestParam String password) {
+    String getAvailableUserQueues(@RequestParam String email, @RequestParam String password) {
         ServerResponse authResponse = authorize(email, password);
         if (!authResponse.isSuccess())
             return authResponse.toString();
 
-        QueueAvailableManager queueAvailableManager = new QueueAvailableManager(userRepository, queueRepository);
-        ServerResponse response = queueAvailableManager.get_available(new QueueAvailableManager.QueueAvailableData(email));
+        ServerResponse response = getQueuesResponse(email, QueueAvailableManager.QueueAvailableMode.BY_USER);
+        if (response.isSuccess()) {
+            QueueAvailableManager.QueueAvailableList queues = (QueueAvailableManager.QueueAvailableList)response.getAdditionalData();
+            return queues.toString();
+        } else {
+            return response.toString();
+        }
+    }
 
-        QueueAvailableManager.QueueAvailableList queues = (QueueAvailableManager.QueueAvailableList)response.getAdditionalData();
-        return queues.toString();
+    @GetMapping(path = "/available_party_queues")
+    public @ResponseBody
+    String getAvailablePartyQueues(@RequestParam String email, @RequestParam String password, @RequestParam String party_id) {
+        ServerResponse authResponse = authorize(email, password);
+        if (!authResponse.isSuccess())
+            return authResponse.toString();
+
+        ServerResponse response = getQueuesResponse(party_id, QueueAvailableManager.QueueAvailableMode.BY_PARTYID);
+        if (response.isSuccess()) {
+            QueueAvailableManager.QueueAvailableList queues = (QueueAvailableManager.QueueAvailableList)response.getAdditionalData();
+            return queues.toString();
+        } else {
+            return response.toString();
+        }
     }
 
     @GetMapping(path = "/all_json")
@@ -146,6 +164,12 @@ public class MainController {
     public @ResponseBody
     Iterable<User> singleUser(@PathVariable Integer id) {
         return userRepository.findUserById(id);
+    }
+
+    private ServerResponse getQueuesResponse(String argument, QueueAvailableManager.QueueAvailableMode mode) {
+        QueueAvailableManager queueAvailableManager = new QueueAvailableManager(userRepository, partyRepository, queueRepository);
+        ServerResponse response = queueAvailableManager.get_available(new QueueAvailableManager.QueueAvailableData(argument, mode));
+        return response;
     }
 
     private ServerResponse authorize(String email, String password) {
