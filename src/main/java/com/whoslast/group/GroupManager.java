@@ -1,6 +1,6 @@
 package com.whoslast.group;
-import com.whoslast.ErrorCodes;
-import com.whoslast.authorization.AuthResponse;
+import com.whoslast.response.ErrorCodes;
+import com.whoslast.response.ServerResponse;
 import com.whoslast.controllers.SuperuserRepository;
 import com.whoslast.controllers.UserRepository;
 import com.whoslast.entities.Party;
@@ -14,8 +14,8 @@ public class GroupManager {
     private UserRepository userDatabase;
     private SuperuserRepository suDatabase;
 
-    private static final String msgSuccess = "Successful gruop creation";
-    private static final String msgFailYouinGroup = "Can't create new group because you already in other group";
+    private static final String msgSuccess = "Successful group creation";
+    private static final String msgFailYouInGroup = "Can't create new group because you already in other group";
     private static final String msgFailGroupExists = "Group with this name is already exists";
 
 
@@ -44,21 +44,21 @@ public class GroupManager {
         return newGroup;
     }
 
-    public AuthResponse NewGroup(String email, String newGrName){
-        AuthResponse actuallyResponse;
+    public ServerResponse NewGroup(String email, String newGrName){
+        ServerResponse actuallyResponse;
         User foundUser = userDatabase.findUserByEmail(email);
         if(foundUser.getPartyId() == null){
             if(partyDatabase.findGroupByName(newGrName) == null){
                 Party newGroup = newGroupBuild(newGrName, email);
                 partyDatabase.save(newGroup);
-                actuallyResponse = new AuthResponse(msgSuccess, AuthResponse.Status.SUCCESS, ErrorCodes.NO_ERROR);
+                actuallyResponse = new ServerResponse(msgSuccess, ErrorCodes.NO_ERROR);
             }
             else {
-                actuallyResponse = new AuthResponse(msgFailGroupExists, AuthResponse.Status.FAIL_USER, ErrorCodes.Groups.GROUP_WITH_THIS_NAME_ALREADY_EXISTS);
+                actuallyResponse = new ServerResponse(msgFailGroupExists, ErrorCodes.Groups.GROUP_WITH_THIS_NAME_ALREADY_EXISTS);
             }
         }
         else{
-            actuallyResponse = new AuthResponse(msgFailYouinGroup, AuthResponse.Status.FAIL_USER, ErrorCodes.Groups.YOU_ALREADY_IN_GROUP);
+            actuallyResponse = new ServerResponse(msgFailYouInGroup, ErrorCodes.Groups.YOU_ALREADY_HAVE_YOUR_OWN_GROUP);
         }
         return actuallyResponse;
     }

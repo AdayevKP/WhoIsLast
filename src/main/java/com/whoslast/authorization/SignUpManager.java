@@ -1,8 +1,9 @@
 package com.whoslast.authorization;
 
-import com.whoslast.ErrorCodes;
+import com.whoslast.response.ErrorCodes;
 import com.whoslast.controllers.UserRepository;
 import com.whoslast.entities.User;
+import com.whoslast.response.ServerResponse;
 
 /**
  * Sign-up manager
@@ -97,27 +98,27 @@ public class SignUpManager extends AuthManager {
      * @param signUpData Data provided by user
      * @return Response indicating status of operation
      */
-    public AuthResponse signUp(UserSignUpData signUpData) {
-        AuthResponse response;
+    public ServerResponse signUp(UserSignUpData signUpData) {
+        ServerResponse response;
         try {
             if (signUpData.hasEmptyFields()) {
-                response = new AuthResponse(msgSignUpErrorEmptyFields, AuthResponse.Status.FAIL_USER, ErrorCodes.Authorization.EMPTY_FIELDS);
+                response = new ServerResponse(msgSignUpErrorEmptyFields, ErrorCodes.Common.EMPTY_FIELDS);
             } else {
                 User foundUser = userDatabase.findUserByEmail(signUpData.getEmail());
                 if (foundUser == null) {
                     User newDatabaseUser = buildDatabaseUser(signUpData);
                     userDatabase.save(newDatabaseUser);
-                    response = new AuthResponse(msgSignUpSuccess, AuthResponse.Status.SUCCESS, ErrorCodes.NO_ERROR);
+                    response = new ServerResponse(msgSignUpSuccess, ErrorCodes.NO_ERROR);
                 } else {
-                    response = new AuthResponse(msgSignUpErrorUserExists, AuthResponse.Status.FAIL_USER, ErrorCodes.Authorization.USER_EXISTS);
+                    response = new ServerResponse(msgSignUpErrorUserExists, ErrorCodes.Users.USER_EXISTS);
                 }
             }
         }
         catch (CredentialsManager.HashEnginePerformException e){
-            response = new AuthResponse(e.getMessage(),  AuthResponse.Status.FAIL_ENVIRONMENT, ErrorCodes.Authorization.ENVIRONMENT_FAIL);
+            response = new ServerResponse(e.getMessage(), ErrorCodes.Authorization.ENVIRONMENT_FAIL);
         }
         catch (CredentialsManager.BadPasswordException e){
-            response = new AuthResponse(e.getMessage(), AuthResponse.Status.FAIL_USER, ErrorCodes.Authorization.BAD_PASSWORD);
+            response = new ServerResponse(e.getMessage(), ErrorCodes.Authorization.BAD_PASSWORD);
         }
         return response;
     }

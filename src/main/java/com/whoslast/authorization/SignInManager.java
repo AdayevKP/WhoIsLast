@@ -1,8 +1,9 @@
 package com.whoslast.authorization;
 
-import com.whoslast.ErrorCodes;
+import com.whoslast.response.ErrorCodes;
 import com.whoslast.controllers.UserRepository;
 import com.whoslast.entities.User;
+import com.whoslast.response.ServerResponse;
 
 /**
  * Sign-in manager
@@ -84,21 +85,21 @@ public class SignInManager extends AuthManager {
      * @param signInData Data provided by user
      * @return Response indicating status of operation
      */
-    public AuthResponse signIn(UserSignInData signInData) {
-        AuthResponse response;
+    public ServerResponse signIn(UserSignInData signInData) {
+        ServerResponse response;
         try {
             if (signInData.hasEmptyFields())
                 throw new SignInException(msgSignInErrorEmptyFields);
             CredentialsManager.Credentials credentials = getCredentials(signInData);
             if (!CredentialsManager.verifyPassword(signInData.getPassword(), credentials))
                 throw new SignInException(msgSignInErrorCredentials);
-            response = new AuthResponse(msgSignInSuccess, AuthResponse.Status.SUCCESS, ErrorCodes.NO_ERROR);
+            response = new ServerResponse(msgSignInSuccess, ErrorCodes.NO_ERROR);
         }
         catch (CredentialsManager.HashEnginePerformException e){
-            response = new AuthResponse(msgSignInErrorEnvironment,  AuthResponse.Status.FAIL_ENVIRONMENT, ErrorCodes.Authorization.ENVIRONMENT_FAIL);
+            response = new ServerResponse(msgSignInErrorEnvironment, ErrorCodes.Authorization.ENVIRONMENT_FAIL);
         }
         catch (CredentialsManager.BadPasswordException | SignInException e){
-            response = new AuthResponse(msgSignInErrorCredentials, AuthResponse.Status.FAIL_USER, ErrorCodes.Authorization.WRONG_CREDENTIALS);
+            response = new ServerResponse(msgSignInErrorCredentials, ErrorCodes.Authorization.WRONG_CREDENTIALS);
         }
         return response;
     }
