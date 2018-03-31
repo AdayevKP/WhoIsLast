@@ -9,7 +9,7 @@ public abstract class ErrorCodes {
     }
 
     //USER ERROR CODES
-    public static class User {
+    public static class Users {
         public static final int USER_EXISTS = 21;
         public static final int USER_DOES_NOT_EXIST = 22;
     }
@@ -26,12 +26,13 @@ public abstract class ErrorCodes {
         public static final int YOU_ALREADY_IN_GROUP = 41;
         public static final int GROUP_WITH_THIS_NAME_ALREADY_EXISTS = 42;
         public static final int YOU_ALREADY_HAVE_YOUR_OWN_GROUP = 43;
-
+        public static final int NOT_IN_GROUP = 44;
+        public static final int GROUP_DOES_NOT_EXIST = 45;
     }
 
     //QUEUE ERROR CODES
-    public static class Queue {
-        public static final int QUEUE_DOES_NOT_EXIST = 44;
-        public static final int ALREADY_IN_QUEUE = 45;
+    public static class Queues {
+        public static final int QUEUE_DOES_NOT_EXIST = 51;
+        public static final int ALREADY_IN_QUEUE = 52;
     }
 }

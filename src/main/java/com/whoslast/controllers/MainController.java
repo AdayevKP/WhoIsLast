@@ -1,5 +1,7 @@
 package com.whoslast.controllers;
 
+import com.mysql.fabric.Server;
+import com.whoslast.queue.QueueAvailableManager;
 import com.whoslast.queue.QueueJoinManager;
 import com.whoslast.response.ServerResponse;
 import com.whoslast.authorization.SignInManager;
@@ -23,6 +25,8 @@ public class MainController {
     private QueueRepository queueRepository;
     @Autowired
     private UserQueueRepository userQueueRepository;
+    @Autowired
+    private PartyQueueRepository partyQueueRepository;
     @Autowired
     private PartyRepository partyRepository;
     @Autowired
@@ -94,9 +98,40 @@ public class MainController {
             return authResponse.toString();
 
         QueueJoinManager queueJoinManager = new QueueJoinManager(userRepository, queueRepository, userQueueRepository);
-        QueueJoinManager.QueueJoinData queueJoinData = new QueueJoinManager.QueueJoinData(email, queue_id);
-        ServerResponse response = queueJoinManager.join(queueJoinData);
+        ServerResponse response = queueJoinManager.join(new QueueJoinManager.QueueJoinData(email, queue_id));
         return response.toString();
+    }
+
+    @GetMapping(path = "/available_user_queues")
+    public @ResponseBody
+    String getAvailableUserQueues(@RequestParam String email, @RequestParam String password) {
+        ServerResponse authResponse = authorize(email, password);
+        if (!authResponse.isSuccess())
+            return authResponse.toString();
+
+        ServerResponse response = getQueuesResponse(email, QueueAvailableManager.QueueAvailableMode.BY_USER);
+        if (response.isSuccess()) {
+            QueueAvailableManager.QueueAvailableList queues = (QueueAvailableManager.QueueAvailableList)response.getAdditionalData();
+            return queues.toString();
+        } else {
+            return response.toString();
+        }
+    }
+
+    @GetMapping(path = "/available_party_queues")
+    public @ResponseBody
+    String getAvailablePartyQueues(@RequestParam String email, @RequestParam String password, @RequestParam String party_id) {
+        ServerResponse authResponse = authorize(email, password);
+        if (!authResponse.isSuccess())
+            return authResponse.toString();
+
+        ServerResponse response = getQueuesResponse(party_id, QueueAvailableManager.QueueAvailableMode.BY_PARTYID);
+        if (response.isSuccess()) {
+            QueueAvailableManager.QueueAvailableList queues = (QueueAvailableManager.QueueAvailableList)response.getAdditionalData();
+            return queues.toString();
+        } else {
+            return response.toString();
+        }
     }
 
     @GetMapping(path = "/all_json")
@@ -117,6 +152,12 @@ public class MainController {
     public @ResponseBody
     Iterable<User> singleUser(@PathVariable Integer id) {
         return userRepository.findUserById(id);
+    }
+
+    private ServerResponse getQueuesResponse(String argument, QueueAvailableManager.QueueAvailableMode mode) {
+        QueueAvailableManager queueAvailableManager = new QueueAvailableManager(userRepository, partyRepository, queueRepository);
+        ServerResponse response = queueAvailableManager.get_available(new QueueAvailableManager.QueueAvailableData(argument, mode));
+        return response;
     }
 
     private ServerResponse authorize(String email, String password) {
