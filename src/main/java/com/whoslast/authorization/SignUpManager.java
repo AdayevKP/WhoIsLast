@@ -110,7 +110,7 @@ public class SignUpManager extends AuthManager {
                     userDatabase.save(newDatabaseUser);
                     response = new ServerResponse(msgSignUpSuccess, ErrorCodes.NO_ERROR);
                 } else {
-                    response = new ServerResponse(msgSignUpErrorUserExists, ErrorCodes.User.USER_EXISTS);
+                    response = new ServerResponse(msgSignUpErrorUserExists, ErrorCodes.Users.USER_EXISTS);
                 }
             }
         }

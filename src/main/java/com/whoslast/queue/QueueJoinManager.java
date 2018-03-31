@@ -108,7 +108,7 @@ public class QueueJoinManager {
      */
     private void analyzeExistenceInQueue(Integer userId, Integer queueId) throws QueueJoinException {
         if (queueListsDatabase.checkExistence(userId, queueId) != 0)
-            throw new QueueJoinException(msgQueueJoinErrorUserIsInQueue, ErrorCodes.Queue.ALREADY_IN_QUEUE);
+            throw new QueueJoinException(msgQueueJoinErrorUserIsInQueue, ErrorCodes.Queues.ALREADY_IN_QUEUE);
     }
 
     /**
@@ -132,7 +132,7 @@ public class QueueJoinManager {
         try {
             num = Integer.parseInt(queueJoinData.getQueueId());
         } catch (NumberFormatException e) {
-            throw new QueueJoinException(msgQueueJoinErrorBadId, ErrorCodes.Queue.QUEUE_DOES_NOT_EXIST);
+            throw new QueueJoinException(msgQueueJoinErrorBadId, ErrorCodes.Queues.QUEUE_DOES_NOT_EXIST);
         }
         return num;
     }
@@ -171,7 +171,7 @@ public class QueueJoinManager {
     private Queue getQueueById(Integer queueId) throws QueueJoinException {
         Queue queue = queueDatabase.getQueueById(queueId);
         if (queue == null)
-            throw new QueueJoinException(msgQueueJoinErrorBadId, ErrorCodes.Queue.QUEUE_DOES_NOT_EXIST);
+            throw new QueueJoinException(msgQueueJoinErrorBadId, ErrorCodes.Queues.QUEUE_DOES_NOT_EXIST);
         return queue;
     }
 
@@ -184,7 +184,7 @@ public class QueueJoinManager {
     private User getUserByEmail(String email) throws QueueJoinException {
         User user = userDatabase.findUserByEmail(email);
         if (user == null)
-            throw new QueueJoinException(msgQueueJoinErrorBadUser, ErrorCodes.User.USER_DOES_NOT_EXIST);
+            throw new QueueJoinException(msgQueueJoinErrorBadUser, ErrorCodes.Users.USER_DOES_NOT_EXIST);
         return user;
     }
 }

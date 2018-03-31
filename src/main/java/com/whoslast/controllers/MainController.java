@@ -1,5 +1,7 @@
 package com.whoslast.controllers;
 
+import com.mysql.fabric.Server;
+import com.whoslast.queue.QueueAvailableManager;
 import com.whoslast.queue.QueueJoinManager;
 import com.whoslast.response.ServerResponse;
 import com.whoslast.authorization.SignInManager;
@@ -22,6 +24,8 @@ public class MainController {
     private QueueRepository queueRepository;
     @Autowired
     private UserQueueRepository userQueueRepository;
+    @Autowired
+    private PartyQueueRepository partyQueueRepository;
     @Autowired
     private PartyRepository partyRepository;
     @Autowired
@@ -108,9 +112,22 @@ public class MainController {
             return authResponse.toString();
 
         QueueJoinManager queueJoinManager = new QueueJoinManager(userRepository, queueRepository, userQueueRepository);
-        QueueJoinManager.QueueJoinData queueJoinData = new QueueJoinManager.QueueJoinData(email, queue_id);
-        ServerResponse response = queueJoinManager.join(queueJoinData);
+        ServerResponse response = queueJoinManager.join(new QueueJoinManager.QueueJoinData(email, queue_id));
         return response.toString();
+    }
+
+    @GetMapping(path = "/available_queues")
+    public @ResponseBody
+    String getAvailableQueues(@RequestParam String email, @RequestParam String password) {
+        ServerResponse authResponse = authorize(email, password);
+        if (!authResponse.isSuccess())
+            return authResponse.toString();
+
+        QueueAvailableManager queueAvailableManager = new QueueAvailableManager(userRepository, queueRepository);
+        ServerResponse response = queueAvailableManager.get_available(new QueueAvailableManager.QueueAvailableData(email));
+
+        QueueAvailableManager.QueueAvailableList queues = (QueueAvailableManager.QueueAvailableList)response.getAdditionalData();
+        return queues.toString();
     }
 
     @GetMapping(path = "/all_json")
