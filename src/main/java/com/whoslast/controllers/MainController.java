@@ -30,14 +30,6 @@ public class MainController {
 
     // @ResponseBody means the returned String is the response, not a view name
     // @RequestParam means it is a parameter from the GET or POST request
-    @GetMapping(path = "/sign_up") // Map ONLY GET Requests
-    public @ResponseBody
-    String signUp(@RequestParam String name
-            , @RequestParam String email, @RequestParam String password) {
-        SignUpManager signUpManager = new SignUpManager(userRepository);
-        ServerResponse response = signUpManager.signUp(new SignUpManager.UserSignUpData(name, email, password));
-        return response.toString();
-    }
 
     @RequestMapping(path = "/signup", method = RequestMethod.GET)
     public String signUpGet() {
@@ -53,14 +45,7 @@ public class MainController {
         SignUpManager.UserSignUpData signUpData = new SignUpManager.UserSignUpData(name, email, password);
         ServerResponse response = signUpManager.signUp(signUpData);
         System.out.println(response);
-        return "index";
-    }
-
-    @GetMapping(path = "/sign_in")
-    public @ResponseBody
-    String signIn(@RequestParam String email, @RequestParam String password) {
-        ServerResponse response = authorize(email, password);
-        return response.toString();
+        return "redirect:all";
     }
 
     @RequestMapping(path = "/signin", method = RequestMethod.GET)
@@ -122,8 +107,9 @@ public class MainController {
 
     @GetMapping(path = "/all")
     public String getAllUsers(Model model) {
+        model.addAttribute("users", userRepository.findAll());
         model.addAttribute("msg", "from server with love");
-        return "index";
+        return "users";
     }
 
 

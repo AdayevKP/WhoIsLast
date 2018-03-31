@@ -44,13 +44,27 @@
     </div><!--/.nav-collapse -->
 </nav>
 
-<div class="container">
 
-    <div class="starter-template">
-        <h1>Иванов Иван Иванович</h1>
-        <!--p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p-->
-    </div>
-
+<div class="col-lg-5 col-md-5 col-sm-5" style="margin-top: 30px; margin-left: 50px ">
+    <table class="table ">
+        <caption>Users</caption>
+        <thead class="thread-dark">
+        <tr>
+            <th scope="col" align="center">#</th>
+            <th scope="col" align="center">Name</th>
+            <th scope="col" align="center">email</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!--/*@thymesVar id="users" type="java"*/-->
+        <tr th:each="user, iter : ${users}">
+            <td th:text="${iter.count}" >1</td>
+            <td th:text="${user.name}" >1</td>
+            <td th:text="${user.email}" >1</td>
+        </tr>
+        </tbody>
+    </table>
 </div>
+
 </body>
 </html>
