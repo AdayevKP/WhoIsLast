@@ -9,6 +9,7 @@ import com.whoslast.group.GroupManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -120,7 +121,8 @@ public class MainController {
     }
 
     @GetMapping(path = "/all")
-    public String getAllUsers() {
+    public String getAllUsers(Model model) {
+        model.addAttribute("msg", "from server with love");
         return "index";
     }
 
