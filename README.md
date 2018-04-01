@@ -20,9 +20,14 @@
 ## Инструкция по установке проекта
 
 1. Установить на ПК Gradle по инструкции указанной на сайте https://gradle.org/;
-2. Настроить MySQL server (в файле resources/application.priperties надо поменять логин и пароль от бд на свои);
-3. Подгрузить репозиторий из CVS Git внутри IntelliJ IDEA (версия Ultimate) - VCS - Checkout from version control - Github (ветка master), в настройках проекта указать путь к Gradle;
-4. Запустить проект.
+2. Настроить MySQL server;
+3. Скачать workbench https://dev.mysql.com/downloads/workbench/, следовать инструкции на картинках:
+![workbench1](https://github.com/AleksandraOrova/WhoIsLast/raw/master/InsturctionsForDB/Screenshot_4.png)
+![workbench2](https://github.com/AleksandraOrova/WhoIsLast/raw/master/InsturctionsForDB/Screenshot_5.png)
+![workbench3](https://github.com/AleksandraOrova/WhoIsLast/raw/master/InsturctionsForDB/Screenshot_6.png)
+4. Подгрузить репозиторий из CVS Git внутри IntelliJ IDEA (версия Ultimate) - VCS - Checkout from version control - Github (ветка master), в настройках проекта указать путь к Gradle;
+5. В файле resources/application.properties.jdk надо поменять логин и пароль от бд на свои.
+6. Запустить проект.
 
 ## Использовались
 
