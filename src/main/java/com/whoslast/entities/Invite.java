@@ -3,8 +3,8 @@ package com.whoslast.entities;
 import javax.persistence.*;
 
 @Entity // This tells Hibernate to make a table out of this class
-@Table(name = "Requests")
-public class Request {
+@Table(name = "Invites")
+public class Invite {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -12,6 +12,7 @@ public class Request {
     @ManyToOne
     @JoinColumn(name="userId")
     private User user;
+
 
     @ManyToOne
     @JoinColumn(name="partyId")
