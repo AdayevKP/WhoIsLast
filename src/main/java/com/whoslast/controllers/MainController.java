@@ -65,6 +65,7 @@ public class MainController {
                              @RequestParam(value = "inputPassword", required = true) String password) {
         System.out.println("in signinPost currently " + email);
         ServerResponse response = authorize(email, password);
+
         System.out.println(response);
         return "index";
     }
