@@ -92,6 +92,24 @@ public class MainController {
         return "index";
     }
 
+    @GetMapping(path = "/add_user_to_group")
+    public @ResponseBody
+    String addUserToGroup(@RequestParam String SUemail, @RequestParam String SUpassword, @RequestParam String UserEmail) {
+        ServerResponse authResponse = authorize(SUemail, SUpassword);
+        ServerResponse groupResponse = null;
+        if (authResponse.isSuccess()) {
+            GroupManager groupManager = new GroupManager(partyRepository, userRepository, suRepository);
+            groupResponse = groupManager.AddUserToGroup(UserEmail, userRepository.findUserByEmail(SUemail).getPartyId().getSpeciality());
+        } else {
+            System.out.println(authResponse.toString());
+        }
+        if (groupResponse != null)
+            System.out.println(groupResponse.toString());
+        return "index";
+    }
+
+
+
     @GetMapping(path = "/join_queue")
     public @ResponseBody
     String joinQueue(@RequestParam String email, @RequestParam String password, @RequestParam String queue_id) {

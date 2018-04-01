@@ -17,7 +17,9 @@ public class GroupManager {
     private static final String msgSuccess = "Successful group creation";
     private static final String msgFailYouInGroup = "Can't create new group because you already in other group";
     private static final String msgFailGroupExists = "Group with this name is already exists";
-
+    private static final String msgNoSuchUser = "There is no user with this email";
+    private static final String msgNoSuchGroup = "There is no group with this name";
+    private static final String msgFailUserInGroup = "Can't add user to group because he already in other group";
 
     public GroupManager(PartyRepository partyDatabase, UserRepository userDatabase, SuperuserRepository suDatabase) {
         this.partyDatabase = partyDatabase;
@@ -34,12 +36,13 @@ public class GroupManager {
         Superuser SUser = new Superuser();
         SUser.setUserId(foundUser.getUserId());
 
-        suDatabase.save(SUser);
-
         newGroup.setName(grName);
         newGroup.setSuperuser(SUser);
 
         foundUser.setGroupId(newGroup);
+
+        suDatabase.save(SUser);
+        userDatabase.save(foundUser);
 
         return newGroup;
     }
@@ -61,5 +64,28 @@ public class GroupManager {
             actuallyResponse = new ServerResponse(msgFailYouInGroup, ErrorCodes.Groups.YOU_ALREADY_HAVE_YOUR_OWN_GROUP);
         }
         return actuallyResponse;
+    }
+
+    public ServerResponse AddUserToGroup(String email, String groupName){
+        User foundUser = userDatabase.findUserByEmail(email);
+        Party foundGroup = partyDatabase.findGroupByName(groupName);
+        ServerResponse response;
+        if(foundUser == null){
+            response = new ServerResponse(msgNoSuchUser, ErrorCodes.Groups.NO_USER_IN_DB);
+        }
+        else if(foundGroup == null){
+            response = new ServerResponse(msgNoSuchGroup, ErrorCodes.Groups.NO_GROUP_IN_DB);
+        }
+        else{
+            if(foundUser.getPartyId() == null) {
+                foundUser.setGroupId(foundGroup);
+                userDatabase.save(foundUser);
+                response = new ServerResponse(msgSuccess, ErrorCodes.NO_ERROR);
+            }
+            else{
+                response = new ServerResponse(msgFailUserInGroup, ErrorCodes.Groups.USER_ALREADY_IN_GROUP);
+            }
+        }
+        return response;
     }
 }

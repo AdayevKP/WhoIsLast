@@ -51,7 +51,7 @@ public class SignUpManager extends AuthManager {
          * Is there any empty fields (empty strings)?
          * @return True -- there are empty strings, False -- there aren't any
          */
-        public boolean hasEmptyFields() {
+            public boolean hasEmptyFields() {
             return this.email.isEmpty() || this.name.isEmpty() || this.password.isEmpty();
 
         }        }

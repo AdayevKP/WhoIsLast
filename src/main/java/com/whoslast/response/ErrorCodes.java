@@ -23,11 +23,13 @@ public abstract class ErrorCodes {
 
     //GROUPS ERROR CODES
     public static class Groups {
-        public static final int YOU_ALREADY_IN_GROUP = 41;
+        public static final int USER_ALREADY_IN_GROUP = 41;
         public static final int GROUP_WITH_THIS_NAME_ALREADY_EXISTS = 42;
         public static final int YOU_ALREADY_HAVE_YOUR_OWN_GROUP = 43;
         public static final int NOT_IN_GROUP = 44;
         public static final int GROUP_DOES_NOT_EXIST = 45;
+        public static final int NO_USER_IN_DB = 46;
+        public static final int NO_GROUP_IN_DB = 47;
     }
 
     //QUEUE ERROR CODES
