@@ -13,10 +13,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 @EnableJpaRepositories
-@RequestMapping(path = "/test") // URL beginning
+@RequestMapping(path = "/") // URL beginning
 public class MainController {
 
     @Autowired
@@ -37,7 +39,7 @@ public class MainController {
 
     @RequestMapping(path = "/signup", method = RequestMethod.GET)
     public String signUpGet() {
-        return "check_in";
+        return "sign_up";
     }
 
     @RequestMapping(path = "/signup", method = RequestMethod.POST)
@@ -144,7 +146,7 @@ public class MainController {
     public String getAllUsers(Model model) {
         model.addAttribute("users", userRepository.findAll());
         model.addAttribute("msg", "from server with love");
-        return "users";
+        return "index";
     }
 
 
@@ -162,5 +164,42 @@ public class MainController {
 
     private ServerResponse authorize(String email, String password) {
         return new SignInManager(userRepository).signIn(new SignInManager.UserSignInData(email, password));
+    }
+
+    /**
+     *  User profile page
+     *
+     * @param id - user id
+     * @param model - passes user to user.html
+     * @return
+     */
+    @GetMapping(path = "/users/{id}")
+    public String userProfile(@PathVariable Integer id, Model model){
+        Iterable<User> user = userRepository.findUserById(id);
+
+        model.addAttribute("users", user);
+        return "user";
+    }
+
+    @RequestMapping(path = "/users/save", method = RequestMethod.POST)
+    public String userProfileEdit(@RequestParam(value = "userEmail", required = true) String email,
+                                        @RequestParam(value = "userPassword", required = true) String password,
+                                        @RequestParam(value = "userName", required = true) String name,
+                                        Model model) {
+        System.out.println("reached edit method");
+        User user = userRepository.findUserByEmail(email);
+        ServerResponse authResponse = authorize(email, password);
+
+        if (authResponse.isSuccess()) {
+            user.setName(name);
+            userRepository.save(user);
+            model.addAttribute("users", user);
+            model.addAttribute("error","");
+            model.addAttribute("id",user.getUserId());
+
+            return "redirect:/users/" + user.getUserId();
+        }
+        model.addAttribute("error","email/password is not correct");
+        return "index";
     }
 }
