@@ -95,9 +95,9 @@ public class MainController {
         return "index";
     }
 
-    @GetMapping(path = "/add_user_to_group")
+    @GetMapping(path = "/add_user_to_group_json")
     public @ResponseBody
-    String addUserToGroup(@RequestParam String SUemail, @RequestParam String SUpassword, @RequestParam String UserEmail) {
+    String addUserToGroupJson(@RequestParam String SUemail, @RequestParam String SUpassword, @RequestParam String UserEmail) {
         ServerResponse authResponse = authorize(SUemail, SUpassword);
         ServerResponse groupResponse = null;
         if (authResponse.isSuccess()) {
@@ -111,6 +111,10 @@ public class MainController {
         return "index";
     }
 
+    @GetMapping(path = "/add_user_to_group")
+    String addUserToGroup(){
+        return  "add_user_to_group";
+    }
 
     @GetMapping(path = "/create_queue")
     public @ResponseBody

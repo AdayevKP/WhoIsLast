@@ -1,0 +1,15 @@
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="base :: header"></div>
+
+<div class="container" style="margin-top: 30px">
+    <h2 class="danger" th:text="${error}"></h2>
+    <!--/*@thymesVar id="users" type="java"*/-->
+        <form class="form-signin" method="post" action="/users/save">
+            <h2 class="form-signin-heading" align="middle">Добавьте пользователя в группу</h2>
+            <label for="inputEmail" class="sr-only">Email address</label>
+            <input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="e-mail адрес" required
+                   autofocus>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Добавить</button>
+        </form>
+</div>
+</html>
