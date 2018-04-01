@@ -150,6 +150,11 @@ public class MainController {
         return response.toString();
     }
 
+    @GetMapping(path = "/join_the_queue")
+    String joinTheQueue(){
+        return  "join_the_queue";
+    }
+
     @GetMapping(path = "/available_user_queues")
     public @ResponseBody
     String getAvailableUserQueues(@RequestParam String email, @RequestParam String password) {
