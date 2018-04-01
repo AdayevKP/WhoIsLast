@@ -2,6 +2,7 @@ package com.whoslast.controllers;
 
 import com.mysql.fabric.Server;
 import com.whoslast.queue.QueueAvailableManager;
+import com.whoslast.queue.QueueCreatorManager;
 import com.whoslast.queue.QueueJoinManager;
 import com.whoslast.response.ServerResponse;
 import com.whoslast.authorization.SignInManager;
@@ -15,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
+import java.util.Date;
 
 @Controller
 @EnableJpaRepositories
@@ -109,6 +111,27 @@ public class MainController {
         return "index";
     }
 
+
+    @GetMapping(path = "/create_queue")
+    public @ResponseBody
+    String createQueue(@RequestParam String email,
+                       @RequestParam String password,
+                       @RequestParam String place,
+                       @RequestParam String prof,
+                       @RequestParam Date time ) {
+        ServerResponse authResponse = authorize(email, password);
+        ServerResponse response;
+        if (!authResponse.isSuccess())
+            return authResponse.toString();
+        else{
+            QueueCreatorManager manager = new QueueCreatorManager(queueRepository);
+            response = manager.createNewQueue(time, place, prof, userRepository.findUserByEmail(email).getUserId());
+        }
+
+        if(response != null)
+            System.out.println(response.toString());
+        return "index";
+    }
 
 
     @GetMapping(path = "/join_queue")

@@ -36,5 +36,7 @@ public abstract class ErrorCodes {
     public static class Queues {
         public static final int QUEUE_DOES_NOT_EXIST = 51;
         public static final int ALREADY_IN_QUEUE = 52;
+        public static final int PROFESSOR_AND_TIME = 53;
+        public static final int PLACE_AND_TIME = 54;
     }
 }
