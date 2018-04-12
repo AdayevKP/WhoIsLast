@@ -22,16 +22,16 @@ public class QueueCreatorManager {
     public QueueCreatorManager(QueueRepository queueDatabase) {
         this.queueDatabase = queueDatabase;
     }
-    private Queue newQueueBuild(Date time, String place, String prof, Integer hostId){
+    private Queue newQueueBuild(Date time, String place, String prof, String queueName){
         Queue newQueue = new Queue();
         newQueue.setPlace(place);
         newQueue.setProfessor(prof);
         newQueue.setTime(time);
-        newQueue.setHost(hostId);
+        newQueue.setQueueName(queueName);
         return newQueue;
     }
 
-    public ServerResponse createNewQueue(Date time, String place, String prof, Integer hostId){
+    public ServerResponse createNewQueue(Date time, String place, String prof, String queueName){
         ServerResponse response;
 
         if(queueDatabase.getQueueByProfAndPlace(prof,place) != null){
@@ -41,7 +41,7 @@ public class QueueCreatorManager {
             response = new ServerResponse(msgPlaceTimeFail, ErrorCodes.Queues.PLACE_AND_TIME);
         }
         else{
-            Queue newQueue = newQueueBuild(time, place, prof, hostId);
+            Queue newQueue = newQueueBuild(time, place, prof, queueName);
             queueDatabase.save(newQueue);
             response = new ServerResponse(msgSuccess, ErrorCodes.NO_ERROR);
         }

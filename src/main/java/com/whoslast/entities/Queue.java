@@ -11,7 +11,7 @@ public class Queue {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer queueId;
 
-    private Integer host;
+    private String queueName;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date time;
@@ -24,12 +24,12 @@ public class Queue {
         return queueId;
     }
 
-    public void setHost(Integer host){
-        this.host = host;
+    public void setQueueName(String queueName){
+        this.queueName = queueName;
     }
 
-    public Integer getHost() {
-        return host;
+    public String getQueueName() {
+        return queueName;
     }
 
     public void setTime(Date time) {

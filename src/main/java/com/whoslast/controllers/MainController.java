@@ -122,14 +122,15 @@ public class MainController {
                        @RequestParam String password,
                        @RequestParam String place,
                        @RequestParam String prof,
-                       @RequestParam Date time ) {
+                       @RequestParam Date time,
+                       @RequestParam String queueName) {
         ServerResponse authResponse = authorize(email, password);
         ServerResponse response;
         if (!authResponse.isSuccess())
             return authResponse.toString();
         else{
             QueueCreatorManager manager = new QueueCreatorManager(queueRepository);
-            response = manager.createNewQueue(time, place, prof, userRepository.findUserByEmail(email).getUserId());
+            response = manager.createNewQueue(time, place, prof, queueName);
         }
 
         if(response != null)
