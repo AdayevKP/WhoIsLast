@@ -22,7 +22,9 @@
 1. Установить на ПК Gradle по инструкции указанной на сайте https://gradle.org/;
 2. Настроить MySQL server;
 3. Скачать workbench https://dev.mysql.com/downloads/workbench/, следовать инструкции на картинках:
-![workbench1](https://github.com/AleksandraOrova/WhoIsLast/raw/master/InsturctionsForDB/Screenshot_4.png) Название для схемы может быть любым, главное его имя использовать при выполнении п. №5.
+![workbench1](https://github.com/AleksandraOrova/WhoIsLast/raw/master/InsturctionsForDB/Screenshot_4.png) 
+
+Название для схемы может быть любым, главное использовать его, как название БД в п. №5.
 
 ![workbench2](https://github.com/AleksandraOrova/WhoIsLast/raw/master/InsturctionsForDB/Screenshot_5.png)
 ![workbench3](https://github.com/AleksandraOrova/WhoIsLast/raw/master/InsturctionsForDB/Screenshot_6.png)
