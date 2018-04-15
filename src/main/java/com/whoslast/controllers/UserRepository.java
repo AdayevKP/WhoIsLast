@@ -1,5 +1,6 @@
 package com.whoslast.controllers;
 
+import com.whoslast.entities.Party;
 import com.whoslast.entities.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -20,4 +21,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Query(value = "SELECT * FROM users WHERE user_id=?1", nativeQuery = true)
     Iterable<User> findUserById(Integer id);
 
+    @Query(value = "SELECT * FROM users WHERE party_id=?1 AND NOT user_id=?2 ", nativeQuery = true)
+    Iterable<User> findGroupMates(Party partyId, Integer currentUserId);
 }

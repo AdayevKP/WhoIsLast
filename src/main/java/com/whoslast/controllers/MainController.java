@@ -238,4 +238,19 @@ public class MainController {
         model.addAttribute("user", user);
         return "user";
     }
+
+    @GetMapping(path = "/groupmates")
+    public String getGroupMates(Model model){
+        User currentUser = userRepository.findUserByEmail(getCurrentEmail());
+        if (currentUser.getPartyId() == null) {
+            model.addAttribute("error", "Пользователь не состоит в группе");
+        } else {
+            Iterable<User> users = userRepository.findGroupMates(currentUser.getPartyId(), currentUser.getUserId());
+            if (!users.iterator().hasNext())
+                model.addAttribute("error", "У вас пока что нет одногруппников");
+            else
+                model.addAttribute("users", users);
+        }
+        return "groupmates";
+    }
 }
