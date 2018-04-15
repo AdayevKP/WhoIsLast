@@ -1,6 +1,6 @@
 package com.whoslast.controllers;
 
-import com.mysql.fabric.Server;
+
 import com.whoslast.queue.QueueAvailableManager;
 import com.whoslast.queue.QueueCreatorManager;
 import com.whoslast.queue.QueueJoinManager;
@@ -16,8 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.view.RedirectView;
 import java.util.Date;
 
 @Controller

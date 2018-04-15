@@ -1,7 +1,9 @@
 package com.whoslast;
 
+import com.whoslast.authorization.SignInManager;
 import com.whoslast.controllers.UserRepository;
 import com.whoslast.entities.User;
+import com.whoslast.response.ServerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,13 +27,20 @@ public class CustomAuth implements AuthenticationProvider {
         String password = authentication.getCredentials().toString();
 
         User user = userRepository.findUserByEmail(name);
+
         System.out.println("custom auth");
         if (user != null) {
+            ServerResponse authResponse = new SignInManager(userRepository).signIn(
+                    new SignInManager.UserSignInData(name, password));
+
             List<GrantedAuthority> grantedAuth = new ArrayList<>();
             grantedAuth.add(new SimpleGrantedAuthority("ROLE_USER"));
             System.out.println(name);
             System.out.println(password);
-            return new UsernamePasswordAuthenticationToken(name, password, grantedAuth);
+            if(authResponse.isSuccess())
+                return new UsernamePasswordAuthenticationToken(name, password, grantedAuth);
+            else
+                return null;
         } else {
             return null;
         }
