@@ -20,7 +20,7 @@ public class User {
 
     private String email;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="partyId")
     private Party party;
 

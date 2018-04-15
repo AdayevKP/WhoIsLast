@@ -1,6 +1,6 @@
 package com.whoslast.controllers;
 
-
+import com.mysql.fabric.Server;
 import com.whoslast.queue.QueueAvailableManager;
 import com.whoslast.queue.QueueCreatorManager;
 import com.whoslast.queue.QueueJoinManager;
@@ -68,9 +68,6 @@ public class MainController {
     public String signInPost(@RequestParam(value = "username", required = true) String email,
                              @RequestParam(value = "password", required = true) String password) {
         System.out.println("in signinPost currently " + email);
-        ServerResponse response = authorize(email, password);
-
-        System.out.println(response);
         return "index";
     }
 
@@ -80,18 +77,12 @@ public class MainController {
     }
 
     @RequestMapping(path = "/new_group", method = RequestMethod.POST)
-    public String addNewGroup(@RequestParam(value = "inputEmail", required = true) String email,
-                              @RequestParam(value = "inputPassword", required = true) String password,
-                              @RequestParam(value = "inputName", required = true) String grName) {
-        ServerResponse authResponse = authorize(email, password);
+    public String addNewGroup(@RequestParam(value = "inputName", required = true) String grName, Model model) {
         ServerResponse groupResponse = null;
+        String email = getCurrentEmail();
+        GroupManager groupManager = new GroupManager(partyRepository, userRepository, suRepository);
+        groupResponse = groupManager.NewGroup(email, grName);
 
-        if (authResponse.isSuccess()) {
-            GroupManager groupManager = new GroupManager(partyRepository, userRepository, suRepository);
-            groupResponse = groupManager.NewGroup(email, grName);
-        } else {
-            System.out.println(authResponse.toString());
-        }
         if (groupResponse != null)
             System.out.println(groupResponse.toString());
         return "index";
@@ -99,15 +90,12 @@ public class MainController {
 
     @GetMapping(path = "/add_user_to_group_json")
     public @ResponseBody
-    String addUserToGroupJson(@RequestParam String SUemail, @RequestParam String SUpassword, @RequestParam String UserEmail) {
-        ServerResponse authResponse = authorize(SUemail, SUpassword);
+    String addUserToGroupJson(@RequestParam String UserEmail, Model model) {
+        String SUemail = getCurrentEmail();
         ServerResponse groupResponse = null;
-        if (authResponse.isSuccess()) {
-            GroupManager groupManager = new GroupManager(partyRepository, userRepository, suRepository);
-            groupResponse = groupManager.AddUserToGroup(UserEmail, userRepository.findUserByEmail(SUemail).getPartyId().getSpeciality());
-        } else {
-            System.out.println(authResponse.toString());
-        }
+        GroupManager groupManager = new GroupManager(partyRepository, userRepository, suRepository);
+        groupResponse = groupManager.AddUserToGroup(UserEmail, userRepository.findUserByEmail(SUemail).getPartyId().getSpeciality());
+
         if (groupResponse != null)
             System.out.println(groupResponse.toString());
         return "index";
@@ -120,33 +108,24 @@ public class MainController {
 
     @GetMapping(path = "/create_queue")
     public @ResponseBody
-    String createQueue(@RequestParam String email,
-                       @RequestParam String password,
-                       @RequestParam String place,
+    String createQueue(@RequestParam String place,
                        @RequestParam String prof,
                        @RequestParam Date time,
-                       @RequestParam String queueName) {
-        ServerResponse authResponse = authorize(email, password);
+                       @RequestParam String queueName,
+                       Model model) {
         ServerResponse response;
-        if (!authResponse.isSuccess())
-            return authResponse.toString();
-        else{
-            QueueCreatorManager manager = new QueueCreatorManager(queueRepository);
-            response = manager.createNewQueue(time, place, prof, queueName);
-        }
+        QueueCreatorManager manager = new QueueCreatorManager(queueRepository);
+        response = manager.createNewQueue(time, place, prof, queueName);
 
         if(response != null)
             System.out.println(response.toString());
         return "index";
     }
 
-
     @GetMapping(path = "/join_queue")
     public @ResponseBody
-    String joinQueue(@RequestParam String email, @RequestParam String password, @RequestParam String queue_id) {
-        ServerResponse authResponse = authorize(email, password);
-        if (!authResponse.isSuccess())
-            return authResponse.toString();
+    String joinQueue(@RequestParam String queue_id, Model model) {
+        String email = getCurrentEmail();
 
         QueueJoinManager queueJoinManager = new QueueJoinManager(userRepository, queueRepository, userQueueRepository);
         ServerResponse response = queueJoinManager.join(new QueueJoinManager.QueueJoinData(email, queue_id));
@@ -160,10 +139,8 @@ public class MainController {
 
     @GetMapping(path = "/available_user_queues")
     public @ResponseBody
-    String getAvailableUserQueues(@RequestParam String email, @RequestParam String password) {
-        ServerResponse authResponse = authorize(email, password);
-        if (!authResponse.isSuccess())
-            return authResponse.toString();
+    String getAvailableUserQueues(Model model) {
+        String email = getCurrentEmail();
 
         ServerResponse response = getQueuesResponse(email, QueueAvailableManager.QueueAvailableMode.BY_USER);
         if (response.isSuccess()) {
@@ -176,11 +153,7 @@ public class MainController {
 
     @GetMapping(path = "/available_party_queues")
     public @ResponseBody
-    String getAvailablePartyQueues(@RequestParam String email, @RequestParam String password, @RequestParam String party_id) {
-        ServerResponse authResponse = authorize(email, password);
-        if (!authResponse.isSuccess())
-            return authResponse.toString();
-
+    String getAvailablePartyQueues(@RequestParam String party_id, Model model) {
         ServerResponse response = getQueuesResponse(party_id, QueueAvailableManager.QueueAvailableMode.BY_PARTYID);
         if (response.isSuccess()) {
             QueueAvailableManager.QueueAvailableList queues = (QueueAvailableManager.QueueAvailableList)response.getAdditionalData();
@@ -216,8 +189,8 @@ public class MainController {
         return response;
     }
 
-    private ServerResponse authorize(String email, String password) {
-        return new SignInManager(userRepository).signIn(new SignInManager.UserSignInData(email, password));
+    private String getCurrentEmail() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
     /**
@@ -241,8 +214,8 @@ public class MainController {
                                         @RequestParam(value = "userName", required = true) String name,
                                         Model model) {
         System.out.println("reached edit method");
+        ServerResponse authResponse = new SignInManager(userRepository).signIn(new SignInManager.UserSignInData(email, password));
         User user = userRepository.findUserByEmail(email);
-        ServerResponse authResponse = authorize(email, password);
 
         if (authResponse.isSuccess()) {
             user.setName(name);
@@ -260,12 +233,9 @@ public class MainController {
 
     @GetMapping(path = "/home")
     public String home(Model model){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findUserByEmail(authentication.getName());
+        User user = userRepository.findUserByEmail(getCurrentEmail());
 
         model.addAttribute("user", user);
         return "user";
     }
-
-
 }

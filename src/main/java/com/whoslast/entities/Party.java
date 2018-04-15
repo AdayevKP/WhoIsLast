@@ -9,7 +9,7 @@ public class Party {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer partyId;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="superuser_id")
     private Superuser superuser;
 
