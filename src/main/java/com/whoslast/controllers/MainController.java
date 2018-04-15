@@ -239,6 +239,17 @@ public class MainController {
         return "user";
     }
 
+    @GetMapping(path = "/home_page")
+    public String homePage(Model model){
+        User user = userRepository.findUserByEmail(getCurrentEmail());
+
+        model.addAttribute("userName", user.getName());
+        model.addAttribute("userGroup", user.getPartyId().getSpeciality());
+        model.addAttribute("userQueues", queueRepository.getQueuesEntriesAvailableToUser(user.getPartyId().getPartyId(), user.getUserId()));
+        model.addAttribute("partyQueues", queueRepository.getQueuesEntriesByPartyId(user.getPartyId().getPartyId()));
+        return "user_home";
+    }
+
     @GetMapping(path = "/groupmates")
     public String getGroupMates(Model model){
         User currentUser = userRepository.findUserByEmail(getCurrentEmail());
