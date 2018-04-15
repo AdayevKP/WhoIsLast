@@ -5,16 +5,16 @@
 <div class="container" style="margin-top: 30px">
     <h2 class="danger" th:text="${error}"></h2>
     <!--/*@thymesVar id="users" type="java"*/-->
-    <div th:each="user : ${users}">
+    <div th:object="${session.user}">
         <form class="form-signin" method="post" action="/users/save">
 
             <label for="userName" class="sr-only">Login</label>
             <input type="text" id="userName" name="userName" class="form-control" placeholder="введите логин"
-                   th:value="${user.name}">
+                   th:value="${name}">
 
             <label for="userEmail" class="sr-only">Email address</label>
             <input type="email" id="userEmail" name="userEmail" class="form-control" placeholder="e-mail адрес" required
-                   autofocus th:value="${user.email}" readonly="true">
+                   autofocus th:value="${email}" readonly="true">
 
             <label for="userPassword" class="sr-only">Password</label>
             <input type="password" id="userPassword" name="userPassword" class="form-control" placeholder="пароль"

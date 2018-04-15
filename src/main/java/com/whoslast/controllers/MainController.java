@@ -11,6 +11,8 @@ import com.whoslast.entities.User;
 import com.whoslast.group.GroupManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -57,14 +59,16 @@ public class MainController {
     }
 
     @RequestMapping(path = "/signin", method = RequestMethod.GET)
-    public String signInGet() {
+    public String signInGet(@RequestParam(value = "error", required = false) String error, Model model) {
+        if (error != null)
+            model.addAttribute("error", "неверные логин и/или пароль");
         System.out.println("inside signin get method");
         return "sign_in";
     }
 
     @RequestMapping(path = "/signin", method = RequestMethod.POST)
-    public String signInPost(@RequestParam(value = "inputEmail", required = true) String email,
-                             @RequestParam(value = "inputPassword", required = true) String password) {
+    public String signInPost(@RequestParam(value = "username", required = true) String email,
+                             @RequestParam(value = "password", required = true) String password) {
         System.out.println("in signinPost currently " + email);
         ServerResponse response = authorize(email, password);
 
@@ -254,4 +258,16 @@ public class MainController {
         model.addAttribute("error","email/password is not correct");
         return "index";
     }
+
+
+    @GetMapping(path = "/home")
+    public String home(Model model){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findUserByEmail(authentication.getName());
+
+        model.addAttribute("user", user);
+        return "user";
+    }
+
+
 }

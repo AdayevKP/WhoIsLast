@@ -13,6 +13,11 @@
             padding-top: 50px;
             padding-bottom: 20px;
         }
+
+         div.container a.input-group-btn {
+             font-size: 14px;
+         }
+
     </style>
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/css/bootstrap-theme.min.css}" rel="stylesheet">
@@ -21,6 +26,26 @@
     <script th:src="@{/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js}"></script>
 
     <body>
+
+    <nav class="navbar navbar-inverse  navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Who Is Last?</a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li><a href="/join_the_queue"><span class="glyphicon glyphicon-list"></span> Очереди</a></li>
+                <li><a href="/add_user_to_group"><span class="glyphicon glyphicon-home"></span> Группы</a></li>
+                <li><a href="/new_group"><span class="glyphicon glyphicon-plus"></span> Создать группу</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                <li><a href="/signin"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!--
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -35,12 +60,15 @@
             </div>
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li ><a href="/join_the_queue">Очереди</a></li>
+                    <li><a href="/join_the_queue">Очереди</a></li>
                     <li><a href="/add_user_to_group">Группы</a></li>
-                    <li><a href="#contact">Преподаватели</a></li>
+                    <li><a href="/new_group">Создать группу</a></li>
+                    <li><a href="/logout">Выйти</a></li>
                 </ul>
             </div>
         </div><!--/.nav-collapse -->
+
+
     </nav>
     </body>
 </div>
