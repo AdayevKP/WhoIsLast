@@ -6,11 +6,11 @@
 
 <div align="center" class="container">
     <h2 class="danger" th:text="${error}"></h2>
-    <form id="inserting_form">
-        <h2 class="form-heading" align="middle">Добавьте пользователей в очередь</h2>
+    <form id="inserting_form" method="post" action="/add_user_to_group">
+        <h2 class="form-heading" align="middle">Добавьте пользователей в группу</h2>
         <button class="btn btn-success btn-sm" onclick="return addline();">Добавить нового</button>
         <div align="center" class="form-inline">
-            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="email">
+            <input type="email" class="form-control" id="exampleInputEmail1" name="inputEmail" placeholder="email">
             <button class="btn btn-danger btn-sm">Удалить</button>
         </div>
         <button id="button" type="submit" class="btn btn-lg btn-primary">Добавить</button>

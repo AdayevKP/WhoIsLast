@@ -28,15 +28,12 @@ public class CustomAuth implements AuthenticationProvider {
 
         User user = userRepository.findUserByEmail(name);
 
-        System.out.println("custom auth");
         if (user != null) {
             ServerResponse authResponse = new SignInManager(userRepository).signIn(
                     new SignInManager.UserSignInData(name, password));
 
             List<GrantedAuthority> grantedAuth = new ArrayList<>();
             grantedAuth.add(new SimpleGrantedAuthority("ROLE_USER"));
-            System.out.println(name);
-            System.out.println(password);
             if(authResponse.isSuccess())
                 return new UsernamePasswordAuthenticationToken(name, password, grantedAuth);
             else

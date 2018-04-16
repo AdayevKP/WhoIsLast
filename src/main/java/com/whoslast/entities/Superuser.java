@@ -23,4 +23,5 @@ public class Superuser {
     public Integer getUserId() {
         return userId;
     }
+
 }

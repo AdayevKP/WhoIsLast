@@ -1,22 +1,20 @@
 package com.whoslast.controllers;
-
-import com.mysql.fabric.Server;
+import com.whoslast.entities.*;
 import com.whoslast.queue.QueueAvailableManager;
 import com.whoslast.queue.QueueCreatorManager;
 import com.whoslast.queue.QueueJoinManager;
 import com.whoslast.response.ServerResponse;
-import com.whoslast.authorization.SignInManager;
 import com.whoslast.authorization.SignUpManager;
-import com.whoslast.entities.User;
 import com.whoslast.group.GroupManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import java.util.Date;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @EnableJpaRepositories
@@ -48,7 +46,6 @@ public class MainController {
     public String signUpPost(@RequestParam(value = "inputEmail", required = true) String email,
                              @RequestParam(value = "inputPassword", required = true) String password,
                              @RequestParam(value = "inputName", required = true) String name) {
-        System.out.println("in signupPost currently " + email);
         SignUpManager signUpManager = new SignUpManager(userRepository);
         SignUpManager.UserSignUpData signUpData = new SignUpManager.UserSignUpData(name, email, password);
         ServerResponse response = signUpManager.signUp(signUpData);
@@ -77,24 +74,11 @@ public class MainController {
     }
 
     @RequestMapping(path = "/new_group", method = RequestMethod.POST)
-    public String addNewGroup(@RequestParam(value = "inputName", required = true) String grName, Model model) {
+    public String addNewGroup(@RequestParam(value = "inputName") String grName, Model model) {
         ServerResponse groupResponse = null;
         String email = getCurrentEmail();
         GroupManager groupManager = new GroupManager(partyRepository, userRepository, suRepository);
         groupResponse = groupManager.NewGroup(email, grName);
-
-        if (groupResponse != null)
-            System.out.println(groupResponse.toString());
-        return "index";
-    }
-
-    @GetMapping(path = "/add_user_to_group_json")
-    public @ResponseBody
-    String addUserToGroupJson(@RequestParam String UserEmail, Model model) {
-        String SUemail = getCurrentEmail();
-        ServerResponse groupResponse = null;
-        GroupManager groupManager = new GroupManager(partyRepository, userRepository, suRepository);
-        groupResponse = groupManager.AddUserToGroup(UserEmail, userRepository.findUserByEmail(SUemail).getPartyId().getSpeciality());
 
         if (groupResponse != null)
             System.out.println(groupResponse.toString());
@@ -106,20 +90,31 @@ public class MainController {
         return  "add_user_to_group";
     }
 
+    @PostMapping(path = "/add_user_to_group")
+    String addUsertoGroupPost(@RequestParam(value = "inputEmail") String email, Model model){
+        User user = userRepository.findUserByEmail(getCurrentEmail());
+        Superuser suser = suRepository.findByUserId(user.getUserId());
+        Party party = partyRepository.findPartyBySuperuserId(suser.getId());
+        GroupManager manager = new GroupManager(partyRepository, userRepository, suRepository);
+        model.addAttribute("msg", manager.AddUserToGroup(email, party.getName()));
+        return "add_user_to_group";
+    }
+
     @GetMapping(path = "/create_queue")
-    public @ResponseBody
-    String createQueue(@RequestParam String place,
-                       @RequestParam String prof,
-                       @RequestParam Date time,
-                       @RequestParam String queueName,
-                       Model model) {
+    public String createQueue(){
+        return "create_queue";
+    }
+
+    @PostMapping(path = "/create_queue")
+    public String createQueue(@RequestParam(value = "GrName") String name) {
         ServerResponse response;
-        QueueCreatorManager manager = new QueueCreatorManager(queueRepository);
-        response = manager.createNewQueue(time, place, prof, queueName);
+        QueueCreatorManager manager = new QueueCreatorManager(queueRepository, partyQueueRepository);
+        User user = userRepository.findUserByEmail(getCurrentEmail());
+        response = manager.createNewQueue(name, user.getPartyId());
 
         if(response != null)
             System.out.println(response.toString());
-        return "index";
+        return "redirect:/home_page";
     }
 
     @GetMapping(path = "/join_queue")
@@ -133,7 +128,14 @@ public class MainController {
     }
 
     @GetMapping(path = "/join_the_queue")
-    String joinTheQueue(){
+    String joinTheQueue(Model model){
+        User user = userRepository.findUserByEmail(getCurrentEmail());
+
+        model.addAttribute("userName", user.getName());
+        model.addAttribute("userGroup", user.getPartyId().getSpeciality());
+        model.addAttribute("userQueues", queueRepository.getQueuesEntriesAvailableToUser(user.getPartyId().getPartyId(), user.getUserId()));
+        model.addAttribute("partyQueues", queueRepository.getQueuesEntriesUserAlreadyIn(user.getPartyId().getPartyId(), user.getUserId()));
+
         return  "join_the_queue";
     }
 
@@ -163,24 +165,11 @@ public class MainController {
         }
     }
 
-    @GetMapping(path = "/all_json")
-    public @ResponseBody
-    Iterable<User> getAllUsersJson() {
-        return userRepository.findAll();
-    }
-
     @GetMapping(path = "/all")
     public String getAllUsers(Model model) {
         model.addAttribute("users", userRepository.findAll());
         model.addAttribute("msg", "from server with love");
         return "index";
-    }
-
-
-    @GetMapping(path = "/users_json/{id}")
-    public @ResponseBody
-    Iterable<User> singleUser(@PathVariable Integer id) {
-        return userRepository.findUserById(id);
     }
 
     private ServerResponse getQueuesResponse(String argument, QueueAvailableManager.QueueAvailableMode mode) {
@@ -193,13 +182,7 @@ public class MainController {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
-    /**
-     *  User profile page
-     *
-     * @param id - user id
-     * @param model - passes user to user.html
-     * @return
-     */
+    /*
     @GetMapping(path = "/users/{id}")
     public String userProfile(@PathVariable Integer id, Model model){
         Iterable<User> user = userRepository.findUserById(id);
@@ -231,13 +214,33 @@ public class MainController {
     }
 
 
+
     @GetMapping(path = "/home")
     public String home(Model model){
         User user = userRepository.findUserByEmail(getCurrentEmail());
-
         model.addAttribute("user", user);
         return "user";
     }
+    */
+
+
+    /*
+    @GetMapping(path = "/add_user_to_group")
+    String addUserToGroup(Model model){
+        model.addAttribute("msg", null);
+        return  "add_user_to_group";
+    }
+
+    @PostMapping(path = "/add_user_to_group")
+    String addUsertoGroupPost(@RequestParam(value = "inputEmail") String email, Model model){
+        User user = userRepository.findUserByEmail(getCurrentEmail());
+        Superuser suser = suRepository.findByUserId(user.getUserId());
+        Party party = partyRepository.findPartyBySuperuserId(suser.getUserId());
+        GroupManager manager = new GroupManager(partyRepository, userRepository, suRepository);
+        model.addAttribute("msg", manager.AddUserToGroup(email, party.getName()));
+        return "add_user_to_group";
+    }
+    */
 
     @GetMapping(path = "/home_page")
     public String homePage(Model model){
@@ -246,7 +249,7 @@ public class MainController {
         model.addAttribute("userName", user.getName());
         model.addAttribute("userGroup", user.getPartyId().getSpeciality());
         model.addAttribute("userQueues", queueRepository.getQueuesEntriesAvailableToUser(user.getPartyId().getPartyId(), user.getUserId()));
-        model.addAttribute("partyQueues", queueRepository.getQueuesEntriesByPartyId(user.getPartyId().getPartyId()));
+        model.addAttribute("partyQueues", queueRepository.getQueuesEntriesUserAlreadyIn(user.getPartyId().getPartyId(), user.getUserId()));
         return "user_home";
     }
 
@@ -263,5 +266,27 @@ public class MainController {
                 model.addAttribute("users", users);
         }
         return "groupmates";
+    }
+
+    @GetMapping(path = "/enter_queue")
+    public String enterQueue(@RequestParam(value = "id") Integer id){
+
+        Queue queue = queueRepository.getQueueById(id);
+        QueueRecord record = new QueueRecord();
+        record.setQueue(queue);
+        record.setUser(userRepository.findUserByEmail(getCurrentEmail()));
+        userQueueRepository.save(record);
+        return "redirect:/home_page";
+    }
+
+    @GetMapping(path = "/queue")
+    public String queueUserList(@RequestParam(value = "id") Integer id, Model model){
+        List<Integer> ids = queueRepository.findAllUsersInQueue(id);
+        List<User> users = new ArrayList<>();
+        for (int el: ids){
+            users.add(userRepository.findUserById(el).iterator().next());
+        }
+        model.addAttribute("users", users);
+        return "index";
     }
 }

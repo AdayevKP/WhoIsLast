@@ -9,52 +9,45 @@
             <td bgcolor="#6495ed">
                 <label>Имя:</label>
             </td>
-            <td th:text="${userName}">1</td>
+            <td th:if="${userName != null}" th:text="${userName}">1</td>
         </tr>
         <tr>
-            <td  bgcolor="#6495ed">
+            <td bgcolor="#6495ed">
                 <label>Группа:</label>
             </td>
-            <td th:text="${userGroup}">1</td>
+            <td th:if="${userGroup != null}" th:text="${userGroup}">1</td>
         </tr>
     </table>
+    <table align="center" width="1000" border="1" class="table" style="margin-top: 40px">
+        <thead class="thread-dark">
+        <tr bgcolor="#6495ed">
+            <th scope="col" align="center">#</th>
+            <th scope="col" align="center">Мои очереди</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!--/*@thymesVar id="partyQueues" type="java"*/-->
+        <tr th:each="queue, iter : ${partyQueues}">
+            <td th:text="${iter.count}">1</td>
+            <td th:text="${queue.queueName}">1</td>
+        </tr>
+        </tbody>
+    </table>
+        <table align="center" width="1000" border="1" class="table">
 
-    <table align="center" width="1000" border="1">
-        <tr >
-            <td>
-                <table class="table">
-                    <thead class="thread-dark">
-                    <tr bgcolor="#6495ed">
-                        <th scope="col" align="center">#</th>
-                        <th scope="col" align="center">Доступные очереди</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!--/*@thymesVar id="partyQueues" type="java"*/-->
-                    <tr th:each="queue, iter : ${partyQueues}">
-                        <td th:text="${iter.count}">1</td>
-                        <td th:text="${queue.queueName}">1</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </td>
-            <td>
-                <table class="table">
-                    <thead class="thread-dark">
-                    <tr bgcolor="#6495ed">
-                        <th scope="col" align="center">Мои очереди</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!--/*@thymesVar id="userQueues" type="java"*/-->
-                    <tr th:each="queue, iter : ${userQueues}">
-                        <td th:text="${queue.queueName}">1</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-    </table>
+            <thead class="thread-dark">
+            <tr bgcolor="#6495ed">
+                <th scope="col" align="center" style="po">Доступные очереди</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!--/*@thymesVar id="userQueues" type="java"*/-->
+            <tr  th:each="queue, iter : ${userQueues}"
+                th:onclick="'window.location.href = \'' + @{/enter_queue?id={id}(id=${queue.queueId})} + '\''">
+                <td th:if="${queue.queueName != null}" th:text="${queue.queueName}">1</td>
+            </tr>
+            </tbody>
+        </table>
 </div>
 
 </body>

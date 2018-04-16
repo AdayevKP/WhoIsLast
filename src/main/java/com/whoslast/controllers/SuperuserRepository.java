@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SuperuserRepository extends CrudRepository<Superuser, Long> {
 
-
+        Superuser findByUserId(Integer id);
 }

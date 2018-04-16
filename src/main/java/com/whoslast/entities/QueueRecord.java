@@ -11,11 +11,11 @@ public class QueueRecord {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer recordId;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="queueId")
     private Queue queue;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="userId")
     private User user;
 

@@ -3,12 +3,12 @@
 <div th:replace="base :: header"></div>
 
 <div class="container" style="margin-top: 30px">
-    <h2 class="danger" th:text="${error}"></h2>
-    <!--/*@thymesVar id="users" type="java"*/-->
-    <div th:object="${session.user}">
-        <form class="form-signin" method="post" action="/users/save">
+<h2 class="danger" th:text="${error}"></h2>
+<!--/*@thymesVar id="users" type="java"*/-->
+<div th:object="${session.user}">
+    <form class="form-signin" method="post" action="/users/save">
 
-            <label for="userName" class="sr-only">Login</label>
+        <label for="userName" class="sr-only">Login</label>
             <input type="text" id="userName" name="userName" class="form-control" placeholder="введите логин"
                    th:value="${name}">
 

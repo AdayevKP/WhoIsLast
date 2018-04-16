@@ -34,4 +34,8 @@ public class Party {
     public String getSpeciality() {
         return name;
     }
+
+    public String getName(){
+        return name;
+    }
 }
