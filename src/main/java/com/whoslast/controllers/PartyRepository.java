@@ -17,4 +17,6 @@ public interface PartyRepository extends CrudRepository<Party, Long>{
 
     //@Query(value = "SELECT * FROM party WHERE superuser_id=?1"), nativeQuery = true)
     Party findPartyBySuperuserId(Integer id);
+
+    Party findPartyByPartyId(Integer id);
 }

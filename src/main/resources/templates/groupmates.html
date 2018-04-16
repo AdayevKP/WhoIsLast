@@ -3,6 +3,17 @@
 <div th:replace="base :: header"></div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <div class="col-lg-5 col-md-5 col-sm-5" style="margin-top: 30px; margin-left: 50px ">
+
+    <h1>
+        <span>Моя группа:</span>
+        <small th:text="${groupName}" ></small>
+    </h1>
+    <div class="info" role="alert" th:if="${queueName} != null">
+        <h2>
+            <span>Очередь:</span>
+            <small th:text="${queueName}" ></small>
+        </h2>
+    </div>
     <div class="alert alert-danger" role="alert" th:if="${error} != null" th:text="${error}">
         <!--/*@thymesVar id="error" type="aj"*/-->
     </div>

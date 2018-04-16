@@ -4,6 +4,12 @@
 
 <div class="container" style="margin-top: 30px">
 
+    <div class="alert alert-danger" role="alert" th:if="${error} != null" th:text="${error}">
+        <!--/*@thymesVar id="error" type="aj"*/-->
+    </div>
+
+
+
     <table align="center" width="500" border="1">
         <tr>
             <td bgcolor="#6495ed">
@@ -18,7 +24,10 @@
             <td th:if="${userGroup != null}" th:text="${userGroup}">1</td>
         </tr>
     </table>
-    <table align="center" width="1000" border="1" class="table" style="margin-top: 40px">
+    <div class="alert alert-danger" role="alert" th:if="${msg} != null" th:text="${msg}" style="margin-top: 30px">
+        <!--/*@thymesVar id="error" type="aj"*/-->
+    </div>
+    <table align="center" width="1000" border="1" class="table" style="margin-top: 40px" th:if="${partyQueues}">
         <thead class="thread-dark">
         <tr bgcolor="#6495ed">
             <th scope="col" align="center">#</th>
@@ -33,7 +42,7 @@
         </tr>
         </tbody>
     </table>
-        <table align="center" width="1000" border="1" class="table">
+        <table align="center" width="1000" border="1" class="table" th:if="${partyQueues}">
 
             <thead class="thread-dark">
             <tr bgcolor="#6495ed">

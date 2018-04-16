@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @EnableJpaRepositories
@@ -57,15 +58,13 @@ public class MainController {
     public String signInGet(@RequestParam(value = "error", required = false) String error, Model model) {
         if (error != null)
             model.addAttribute("error", "неверные логин и/или пароль");
-        System.out.println("inside signin get method");
         return "sign_in";
     }
 
     @RequestMapping(path = "/signin", method = RequestMethod.POST)
     public String signInPost(@RequestParam(value = "username", required = true) String email,
                              @RequestParam(value = "password", required = true) String password) {
-        System.out.println("in signinPost currently " + email);
-        return "index";
+        return "groupmates";
     }
 
     @RequestMapping(path = "/new_group", method = RequestMethod.GET)
@@ -82,7 +81,7 @@ public class MainController {
 
         if (groupResponse != null)
             System.out.println(groupResponse.toString());
-        return "index";
+        return "groupmates";
     }
 
     @GetMapping(path = "/add_user_to_group")
@@ -106,15 +105,23 @@ public class MainController {
     }
 
     @PostMapping(path = "/create_queue")
-    public String createQueue(@RequestParam(value = "GrName") String name) {
-        ServerResponse response;
+    public String createQueue(@RequestParam(value = "GrName") String name, Model model) {
         QueueCreatorManager manager = new QueueCreatorManager(queueRepository, partyQueueRepository);
         User user = userRepository.findUserByEmail(getCurrentEmail());
-        response = manager.createNewQueue(name, user.getPartyId());
+        Party party = user.getPartyId();
+        boolean error = false;
 
-        if(response != null)
-            System.out.println(response.toString());
-        return "redirect:/home_page";
+        //check whether user is party leader
+        if(!Objects.equals(user.getUserId(), party.getSuperuser().getUserId())){
+            error = true;
+            }
+        else
+            manager.createNewQueue(name, user.getPartyId());
+
+        String ans = "redirect:/home_page";
+        if (error)
+            ans += "?error=true";
+        return ans;
     }
 
     @GetMapping(path = "/join_queue")
@@ -167,9 +174,9 @@ public class MainController {
 
     @GetMapping(path = "/all")
     public String getAllUsers(Model model) {
-        model.addAttribute("users", userRepository.findAll());
-        model.addAttribute("msg", "from server with love");
-        return "index";
+        //model.addAttribute("users", userRepository.findAll());
+        //model.addAttribute("msg", "from server with love");
+        return "redirect:/home_page";
     }
 
     private ServerResponse getQueuesResponse(String argument, QueueAvailableManager.QueueAvailableMode mode) {
@@ -182,74 +189,24 @@ public class MainController {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
-    /*
-    @GetMapping(path = "/users/{id}")
-    public String userProfile(@PathVariable Integer id, Model model){
-        Iterable<User> user = userRepository.findUserById(id);
-
-        model.addAttribute("users", user);
-        return "user";
-    }
-
-    @RequestMapping(path = "/users/save", method = RequestMethod.POST)
-    public String userProfileEdit(@RequestParam(value = "userEmail", required = true) String email,
-                                        @RequestParam(value = "userPassword", required = true) String password,
-                                        @RequestParam(value = "userName", required = true) String name,
-                                        Model model) {
-        System.out.println("reached edit method");
-        ServerResponse authResponse = new SignInManager(userRepository).signIn(new SignInManager.UserSignInData(email, password));
-        User user = userRepository.findUserByEmail(email);
-
-        if (authResponse.isSuccess()) {
-            user.setName(name);
-            userRepository.save(user);
-            model.addAttribute("users", user);
-            model.addAttribute("error","");
-            model.addAttribute("id",user.getUserId());
-
-            return "redirect:/users/" + user.getUserId();
-        }
-        model.addAttribute("error","email/password is not correct");
-        return "index";
-    }
-
-
-
-    @GetMapping(path = "/home")
-    public String home(Model model){
-        User user = userRepository.findUserByEmail(getCurrentEmail());
-        model.addAttribute("user", user);
-        return "user";
-    }
-    */
-
-
-    /*
-    @GetMapping(path = "/add_user_to_group")
-    String addUserToGroup(Model model){
-        model.addAttribute("msg", null);
-        return  "add_user_to_group";
-    }
-
-    @PostMapping(path = "/add_user_to_group")
-    String addUsertoGroupPost(@RequestParam(value = "inputEmail") String email, Model model){
-        User user = userRepository.findUserByEmail(getCurrentEmail());
-        Superuser suser = suRepository.findByUserId(user.getUserId());
-        Party party = partyRepository.findPartyBySuperuserId(suser.getUserId());
-        GroupManager manager = new GroupManager(partyRepository, userRepository, suRepository);
-        model.addAttribute("msg", manager.AddUserToGroup(email, party.getName()));
-        return "add_user_to_group";
-    }
-    */
-
     @GetMapping(path = "/home_page")
-    public String homePage(Model model){
+    public String homePage(@RequestParam(value = "error", required = false) String error , Model model){
         User user = userRepository.findUserByEmail(getCurrentEmail());
+
+        if(error != null && error.equals("true"))
+            model.addAttribute("error", "You are not party leader, you can't create queue :(");
 
         model.addAttribute("userName", user.getName());
-        model.addAttribute("userGroup", user.getPartyId().getSpeciality());
-        model.addAttribute("userQueues", queueRepository.getQueuesEntriesAvailableToUser(user.getPartyId().getPartyId(), user.getUserId()));
-        model.addAttribute("partyQueues", queueRepository.getQueuesEntriesUserAlreadyIn(user.getPartyId().getPartyId(), user.getUserId()));
+        Party party = user.getPartyId();
+        if(party != null) {
+            model.addAttribute("userGroup", user.getPartyId().getSpeciality());
+            model.addAttribute("userQueues", queueRepository.getQueuesEntriesAvailableToUser(user.getPartyId().getPartyId(), user.getUserId()));
+            model.addAttribute("partyQueues", queueRepository.getQueuesEntriesUserAlreadyIn(user.getPartyId().getPartyId(), user.getUserId()));
+        }
+        else{
+            model.addAttribute("userGroup", " - ");
+            model.addAttribute("msg", "You are not a member of any group");
+        }
         return "user_home";
     }
 
@@ -259,12 +216,15 @@ public class MainController {
         if (currentUser.getPartyId() == null) {
             model.addAttribute("error", "Пользователь не состоит в группе");
         } else {
+            Party party = partyRepository.findPartyByPartyId(currentUser.getPartyId().getPartyId());
+            model.addAttribute("groupName", party.getName());
             Iterable<User> users = userRepository.findGroupMates(currentUser.getPartyId(), currentUser.getUserId());
             if (!users.iterator().hasNext())
                 model.addAttribute("error", "У вас пока что нет одногруппников");
             else
                 model.addAttribute("users", users);
         }
+
         return "groupmates";
     }
 
@@ -287,6 +247,8 @@ public class MainController {
             users.add(userRepository.findUserById(el).iterator().next());
         }
         model.addAttribute("users", users);
-        return "index";
+        model.addAttribute("groupName", users.get(0).getPartyId().getName());
+        model.addAttribute("queueName", queueRepository.getQueueById(id).getQueueName());
+        return "groupmates";
     }
 }
