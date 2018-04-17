@@ -5,9 +5,11 @@
 <script th:src="@{/js/vendor/adding_users.js}"></script>
 
 <div align="center" class="container">
-    <h2 class="danger" th:text="${error}"></h2>
+
     <form id="inserting_form" method="post" action="/add_user_to_group">
         <h2 class="form-heading" align="middle">Добавьте пользователей в группу</h2>
+        <div class="alert alert-danger" role="alert" th:if="${error != null}" th:text="${error}"></div>
+        <div class="alert alert-success" role="alert" th:if="${msg != null}" th:text="${msg}"></div>
         <button class="btn btn-success btn-sm" onclick="return addline();">Добавить нового</button>
         <div align="center" class="form-inline">
             <input type="email" class="form-control" id="exampleInputEmail1" name="inputEmail" placeholder="email">

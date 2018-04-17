@@ -106,7 +106,8 @@ public class MainController {
         groupResponse = groupManager.NewGroup(email, grName);
 
         if (groupResponse != null)
-            System.out.println(groupResponse.toString());
+            model.addAttribute("msg", groupResponse.getMsg());
+
         return "groupmates";
     }
 
@@ -119,9 +120,22 @@ public class MainController {
     String addUsertoGroupPost(@RequestParam(value = "inputEmail") String email, Model model){
         User user = userRepository.findUserByEmail(getCurrentEmail());
         Superuser suser = suRepository.findByUserId(user.getUserId());
+
+        //if current user doesn't own group, return with error message
+        if(suser == null || !user.getUserId().equals(suser.getUserId())){
+            model.addAttribute("error", "Вы не владелец группы и не можете добавлять юзеров в группу");
+            return "add_user_to_group";
+        }
+
         Party party = partyRepository.findPartyBySuperuserId(suser.getId());
+
+
         GroupManager manager = new GroupManager(partyRepository, userRepository, suRepository);
-        model.addAttribute("msg", manager.AddUserToGroup(email, party.getName()));
+        ServerResponse response = manager.AddUserToGroup(email, party.getName());
+        if(response.getErrorCode() == ErrorCodes.NO_ERROR)
+            model.addAttribute("msg", response);
+        else
+            model.addAttribute("error", response);
         return "add_user_to_group";
     }
 

@@ -14,12 +14,14 @@ public class GroupManager {
     private UserRepository userDatabase;
     private SuperuserRepository suDatabase;
 
-    private static final String msgSuccess = "Successful group creation";
+    private static final String msgSuccessCreated = "Successful group creation";
+    private static final String msgSuccessAddedUser = "Юзер успешно добавлен";
     private static final String msgFailYouInGroup = "Can't create new group because you already in other group";
-    private static final String msgFailGroupExists = "Group with this name is already exists";
-    private static final String msgNoSuchUser = "There is no user with this email";
+    private static final String msgFailGroupExists = "Группа с таким именем уже существует";
+    private static final String msgNoSuchUser = "Не существует пользователя с таким логином";
     private static final String msgNoSuchGroup = "There is no group with this name";
-    private static final String msgFailUserInGroup = "Can't add user to group because he already in other group";
+    private static final String msgAccessViolation = "Вы не владелец группы";
+    private static final String msgFailUserInGroup = "Нельзя добавить юзера, он уже состоит в другой группе";
 
     public GroupManager(PartyRepository partyDatabase, UserRepository userDatabase, SuperuserRepository suDatabase) {
         this.partyDatabase = partyDatabase;
@@ -54,10 +56,11 @@ public class GroupManager {
             if(partyDatabase.findGroupByName(newGrName) == null){
                 Party newGroup = newGroupBuild(newGrName, email);
                 partyDatabase.save(newGroup);
-                actuallyResponse = new ServerResponse(msgSuccess, ErrorCodes.NO_ERROR);
+                actuallyResponse = new ServerResponse(msgSuccessCreated, ErrorCodes.NO_ERROR);
             }
             else {
-                actuallyResponse = new ServerResponse(msgFailGroupExists, ErrorCodes.Groups.GROUP_WITH_THIS_NAME_ALREADY_EXISTS);
+                actuallyResponse = new ServerResponse(msgFailGroupExists + ", name = " + newGrName,
+                        ErrorCodes.Groups.GROUP_WITH_THIS_NAME_ALREADY_EXISTS);
             }
         }
         else{
@@ -71,7 +74,7 @@ public class GroupManager {
         Party foundGroup = partyDatabase.findGroupByName(groupName);
         ServerResponse response;
         if(foundUser == null){
-            response = new ServerResponse(msgNoSuchUser, ErrorCodes.Groups.NO_USER_IN_DB);
+            response = new ServerResponse(msgNoSuchUser + ", login: " + email, ErrorCodes.Groups.NO_USER_IN_DB);
         }
         else if(foundGroup == null){
             response = new ServerResponse(msgNoSuchGroup, ErrorCodes.Groups.NO_GROUP_IN_DB);
@@ -80,10 +83,10 @@ public class GroupManager {
             if(foundUser.getPartyId() == null) {
                 foundUser.setGroupId(foundGroup);
                 userDatabase.save(foundUser);
-                response = new ServerResponse(msgSuccess, ErrorCodes.NO_ERROR);
+                response = new ServerResponse(msgSuccessAddedUser + ", login: " + email, ErrorCodes.NO_ERROR);
             }
             else{
-                response = new ServerResponse(msgFailUserInGroup, ErrorCodes.Groups.USER_ALREADY_IN_GROUP);
+                response = new ServerResponse(msgFailUserInGroup + ", user: " + email, ErrorCodes.Groups.USER_ALREADY_IN_GROUP);
             }
         }
         return response;
