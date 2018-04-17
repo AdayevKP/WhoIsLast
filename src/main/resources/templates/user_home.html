@@ -21,6 +21,12 @@
             <td bgcolor="#6495ed">
                 <label>Группа:</label>
             </td>
+            <td th:if="${email != null}" th:text="${email}">1</td>
+        </tr>
+        <tr>
+            <td bgcolor="#6495ed">
+                <label>Группа:</label>
+            </td>
             <td th:if="${userGroup != null}" th:text="${userGroup}">1</td>
         </tr>
     </table>

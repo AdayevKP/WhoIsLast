@@ -203,8 +203,7 @@ public class MainController {
 
     private ServerResponse getQueuesResponse(String argument, QueueAvailableManager.QueueAvailableMode mode) {
         QueueAvailableManager queueAvailableManager = new QueueAvailableManager(userRepository, partyRepository, queueRepository);
-        ServerResponse response = queueAvailableManager.get_available(new QueueAvailableManager.QueueAvailableData(argument, mode));
-        return response;
+        return queueAvailableManager.get_available(new QueueAvailableManager.QueueAvailableData(argument, mode));
     }
 
     private String getCurrentEmail() {
@@ -219,8 +218,10 @@ public class MainController {
             model.addAttribute("error", "You are not party leader, you can't create queue :(");
 
         model.addAttribute("userName", user.getName());
+        model.addAttribute("email", user.getEmail());
         Party party = user.getPartyId();
         if(party != null) {
+
             model.addAttribute("userGroup", user.getPartyId().getSpeciality());
             model.addAttribute("userQueues", queueRepository.getQueuesEntriesAvailableToUser(user.getPartyId().getPartyId(), user.getUserId()));
             model.addAttribute("partyQueues", queueRepository.getQueuesEntriesUserAlreadyIn(user.getPartyId().getPartyId(), user.getUserId()));
