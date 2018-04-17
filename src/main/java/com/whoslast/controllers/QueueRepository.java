@@ -30,4 +30,6 @@ public interface QueueRepository extends CrudRepository<Queue, Long>{
 
     @Query(value = "SELECT user_id FROM users WHERE user_id IN (SELECT user_id FROM list WHERE queue_id=?1)", nativeQuery = true)
     List<Integer> findAllUsersInQueue(Integer queueId);
+
+    Iterable<Queue> findByQueueName(String name);
 }

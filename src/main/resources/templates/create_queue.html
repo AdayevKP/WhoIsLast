@@ -4,6 +4,9 @@
 <div class="container" style="margin-top: 30px">
     <form class="form-signin" method="post" action="/create_queue">
         <h2 class="form-signin-heading" align="middle">Создать очередь</h2>
+        <div class="alert alert-danger" role="alert" th:if="${error != null}" th:text="${error}">
+            <!--/*@thymesVar id="error" type="aj"*/-->
+        </div>
         <label for="inputEmail" class="sr-only">Название очереди</label>
         <input type="text" id="inputEmail" name="GrName" class="form-control" placeholder="Название очереди" required
                autofocus>

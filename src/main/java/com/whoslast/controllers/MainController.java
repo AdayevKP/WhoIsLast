@@ -116,6 +116,11 @@ public class MainController {
         return  "add_user_to_group";
     }
 
+    @GetMapping(path = "/")
+    String greetingPage(){
+        return  "start_page";
+    }
+
     @PostMapping(path = "/add_user_to_group")
     String addUsertoGroupPost(@RequestParam(value = "inputEmail") String email, Model model){
         User user = userRepository.findUserByEmail(getCurrentEmail());
@@ -155,8 +160,20 @@ public class MainController {
         if(!Objects.equals(user.getUserId(), party.getSuperuser().getUserId())){
             error = true;
             }
-        else
+        else {
+            Iterable<Queue> queues = queueRepository.findByQueueName(name);
+
+            for (Queue q : queues){
+                PartyQueue records = partyQueueRepository.findByQueue(q);
+
+                if (records.getPartyId().getPartyId().equals(party.getPartyId())){
+                    model.addAttribute("error", "группа с таким именем уже существует");
+                    return "create_queue";
+                }
+            }
             manager.createNewQueue(name, user.getPartyId());
+
+        }
 
         String ans = "redirect:/home_page";
         if (error)
