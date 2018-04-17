@@ -6,6 +6,7 @@
 
     <form class="form-signin" method="post" action="/signup">
         <h2 class="form-signin-heading" align="middle">Зарегистрируйтесь</h2>
+        <div class="alert alert-danger" role="alert" th:if="${error != null}" th:text="${error}"></div>
         <label for="inputPassword" class="sr-only">Login</label>
         <input type="text" id="login" name="inputName" class="form-control" placeholder="введите логин" required>
         <label for="inputEmail" class="sr-only">Email address</label>

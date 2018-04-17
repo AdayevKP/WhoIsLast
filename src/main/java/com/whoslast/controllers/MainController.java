@@ -3,6 +3,7 @@ import com.whoslast.entities.*;
 import com.whoslast.queue.QueueAvailableManager;
 import com.whoslast.queue.QueueCreatorManager;
 import com.whoslast.queue.QueueJoinManager;
+import com.whoslast.response.ErrorCodes;
 import com.whoslast.response.ServerResponse;
 import com.whoslast.authorization.SignUpManager;
 import com.whoslast.group.GroupManager;
@@ -55,7 +56,7 @@ public class MainController {
     public String signUpPost(@RequestParam(value = "inputEmail", required = true) String email,
                              @RequestParam(value = "inputPassword", required = true) String password,
                              @RequestParam(value = "inputName", required = true) String name,
-                             HttpServletRequest request) {
+                             HttpServletRequest request, Model model) {
 
         //register user in system
         SignUpManager signUpManager = new SignUpManager(userRepository);
@@ -71,9 +72,12 @@ public class MainController {
         Authentication authenticatedUser = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
 
-
-        System.out.println(response);
-        return "redirect:all";
+        if(response.getErrorCode() == ErrorCodes.NO_ERROR)
+            return "redirect:all";
+        else{
+            model.addAttribute("error", response.getMsg());
+            return "sign_up";
+        }
     }
 
     @RequestMapping(path = "/signin", method = RequestMethod.GET)
@@ -227,8 +231,8 @@ public class MainController {
             model.addAttribute("partyQueues", queueRepository.getQueuesEntriesUserAlreadyIn(user.getPartyId().getPartyId(), user.getUserId()));
         }
         else{
-            model.addAttribute("userGroup", " - ");
-            model.addAttribute("msg", "You are not a member of any group");
+            model.addAttribute("userGroup", "Вы не состоите ни в одной из групп");
+            //model.addAttribute("msg", "You are not a member of any group");
         }
         return "user_home";
     }
