@@ -8,11 +8,16 @@ import com.whoslast.authorization.SignUpManager;
 import com.whoslast.group.GroupManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +26,9 @@ import java.util.Objects;
 @EnableJpaRepositories
 @RequestMapping(path = "/") // URL beginning
 public class MainController {
+
+    @Autowired
+    protected AuthenticationManager authenticationManager;
 
     @Autowired
     private UserRepository userRepository;
@@ -46,10 +54,24 @@ public class MainController {
     @RequestMapping(path = "/signup", method = RequestMethod.POST)
     public String signUpPost(@RequestParam(value = "inputEmail", required = true) String email,
                              @RequestParam(value = "inputPassword", required = true) String password,
-                             @RequestParam(value = "inputName", required = true) String name) {
+                             @RequestParam(value = "inputName", required = true) String name,
+                             HttpServletRequest request) {
+
+        //register user in system
         SignUpManager signUpManager = new SignUpManager(userRepository);
         SignUpManager.UserSignUpData signUpData = new SignUpManager.UserSignUpData(name, email, password);
         ServerResponse response = signUpManager.signUp(signUpData);
+
+
+        //auto login in current session
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(email, password);
+        // generate session if one doesn't exist
+        request.getSession();
+        token.setDetails(new WebAuthenticationDetails(request));
+        Authentication authenticatedUser = authenticationManager.authenticate(token);
+        SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
+
+
         System.out.println(response);
         return "redirect:all";
     }
