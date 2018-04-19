@@ -15,13 +15,13 @@ public class GroupManager {
     private SuperuserRepository suDatabase;
 
     private static final String msgSuccessCreated = "Successful group creation";
-    private static final String msgSuccessAddedUser = "Юзер успешно добавлен";
+    private static final String msgSuccessAddedUser = "Пользователь успешно добавлен";
     private static final String msgFailYouInGroup = "Can't create new group because you already in other group";
     private static final String msgFailGroupExists = "Группа с таким именем уже существует";
     private static final String msgNoSuchUser = "Не существует пользователя с таким логином";
     private static final String msgNoSuchGroup = "There is no group with this name";
     private static final String msgAccessViolation = "Вы не владелец группы";
-    private static final String msgFailUserInGroup = "Нельзя добавить юзера, он уже состоит в другой группе";
+    private static final String msgFailUserInGroup = "Нельзя добавить пользователя, он уже состоит в другой группе";
 
     public GroupManager(PartyRepository partyDatabase, UserRepository userDatabase, SuperuserRepository suDatabase) {
         this.partyDatabase = partyDatabase;
@@ -86,7 +86,7 @@ public class GroupManager {
                 response = new ServerResponse(msgSuccessAddedUser + ", login: " + email, ErrorCodes.NO_ERROR);
             }
             else{
-                response = new ServerResponse(msgFailUserInGroup + ", user: " + email, ErrorCodes.Groups.USER_ALREADY_IN_GROUP);
+                response = new ServerResponse(msgFailUserInGroup + ", login: " + email, ErrorCodes.Groups.USER_ALREADY_IN_GROUP);
             }
         }
         return response;

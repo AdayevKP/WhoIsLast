@@ -5,17 +5,16 @@
 <script th:src="@{/js/vendor/adding_users.js}"></script>
 
 <div align="center" class="container">
-
     <form id="inserting_form" method="post" action="/add_user_to_group">
         <h2 class="form-heading" align="middle">Добавьте пользователей в группу</h2>
         <div class="alert alert-danger" role="alert" th:if="${error != null}" th:text="${error}"></div>
         <div class="alert alert-success" role="alert" th:if="${msg != null}" th:text="${msg}"></div>
-        <button class="btn btn-success btn-sm" onclick="return addline();">Добавить нового</button>
-        <div align="center" class="form-inline">
-            <input type="email" class="form-control" id="exampleInputEmail1" name="inputEmail" placeholder="email">
-            <button class="btn btn-danger btn-sm">Удалить</button>
+        <button class="btn btn-success btn-sm" onclick="return addline();"><span class="glyphicon glyphicon-plus"></span></button>
+        <div align="center" class="form-inline" style="margin-top: 20px">
+            <input type="email" class="form-control" id="exampleInputEmail" name="inputEmail" placeholder="email">
+            <button class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-minus"></span></button>
         </div>
-        <button id="button" type="submit" class="btn btn-lg btn-primary">Добавить</button>
+        <button style="margin-top: 50px" id="button" type="submit" class="btn btn-lg btn-primary">Добавить</button>
     </form>
 </div>
 </html>
