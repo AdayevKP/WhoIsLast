@@ -9,60 +9,93 @@
     </div>
 
 
-
     <table align="center" width="500" border="1">
         <tr>
-            <td bgcolor="#6495ed">
-                <label>Имя:</label>
+            <td align="center" class=bg-primary">
+                <label><font color="black">Имя:</font></label>
             </td>
-            <td th:if="${userName != null}" th:text="${userName}">1</td>
+            <td align="center" th:if="${userName != null}" th:text="${userName}">1</td>
         </tr>
         <tr>
-            <td bgcolor="#6495ed">
-                <label>Почта:</label>
+            <td align="center" class=bg-primary">
+                <label><font color="black">Почта:</font></label>
             </td>
-            <td th:if="${email != null}" th:text="${email}">1</td>
+            <td align="center" th:if="${email != null}" th:text="${email}">1</td>
         </tr>
         <tr>
-            <td bgcolor="#6495ed">
-                <label>Группа:</label>
+            <td align="center" class=bg-primary">
+                <label><font color="black">Группа:</font></label>
             </td>
-            <td th:if="${userGroup != null}" th:text="${userGroup}">1</td>
+            <td align="center" th:if="${userGroup != null}" th:text="${userGroup}">1</td>
         </tr>
     </table>
     <div class="alert alert-dark" role="alert" th:if="${msg} != null" th:text="${msg}" style="margin-top: 30px">
         <!--/*@thymesVar id="error" type="aj"*/-->
     </div>
-    <table align="center" width="1000" border="1" class="table" style="margin-top: 40px" th:if="${partyQueues}">
-        <thead class="thread-dark">
-        <tr bgcolor="#6495ed">
-            <th scope="col" align="center">#</th>
-            <th scope="col" align="center">Мои очереди</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!--/*@thymesVar id="partyQueues" type="java"*/-->
-        <tr th:each="queue, iter : ${partyQueues}">
-            <td th:text="${iter.count}">1</td>
-            <td th:text="${queue.queueName}">1</td>
-        </tr>
-        </tbody>
-    </table>
-        <table align="center" width="1000" border="1" class="table" th:if="${partyQueues}">
 
-            <thead class="thread-dark">
-            <tr bgcolor="#6495ed">
-                <th scope="col" align="center">Доступные очереди</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!--/*@thymesVar id="userQueues" type="java"*/-->
-            <tr  th:each="queue, iter : ${userQueues}"
-                th:onclick="'window.location.href = \'' + @{/enter_queue?id={id}(id=${queue.queueId})} + '\''">
-                <td th:if="${queue.queueName != null}" th:text="${queue.queueName}">1</td>
-            </tr>
-            </tbody>
-        </table>
+    <table align="center">
+        <tr>
+            <td width="400" valign="top">
+                <form>
+                    <table width="200" border="0" class="table table-striped" style="margin-top: 40px"
+                           th:if="${partyQueues}">
+                        <thead>
+                        <tr>
+                            <td class=bg-primary" colspan="2" bgcolor="#6495ed" align="center">
+                                <label><font color="black">Мои очереди</font></label>
+                            </td>
+                        </tr>
+                        </thead>
+                        <!--/*@thymesVar id="partyQueues" type="java"*/-->
+                        <tr th:each="queue, iter : ${partyQueues}">
+                            <td align="center" th:text="${queue.queueName}">
+                            </td>
+                            <td>
+                                <input type="checkbox">
+                            </td>
+                        </tr>
+                    </table>
+                    <div align="center">
+                        <button style="margin-top: 50px" id="getOutQueue" type="submit"
+                                class="btn btn-lg btn-danger">
+                            Покинуть очереди
+                        </button>
+                    </div>
+                </form>
+            </td>
+            <td width="200">
+
+            </td>
+            <td width="400" valign="top">
+                <form>
+                    <table width="200" border="0" class="table table-striped" style="margin-top: 40px"
+                           th:if="${partyQueues}">
+                        <thead class="thread-dark">
+                        <tr>
+                            <td class=bg-primary" colspan="2" align="center">
+                                <label><font color="black">Доступные очереди</font></label>
+                            </td>
+                        </tr>
+                        </thead>
+                        <!--/*@thymesVar id="userQueues" type="java"*/-->
+                        <tr th:each="queue, iter : ${userQueues}"
+                            th:onclick="'window.location.href = \'' + @{/enter_queue?id={id}(id=${queue.queueId})} + '\''">
+                            <td align="center" th:if="${queue.queueName != null}" th:text="${queue.queueName}">1</td>
+                            <td>
+                                <input type="checkbox">
+                            </td>
+                        </tr>
+                    </table>
+                    <div align="center">
+                        <button style="margin-top: 50px" id="getInQueue" type="submit"
+                                class="btn btn-lg btn-success">
+                            Встать в очереди
+                        </button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+    </table>
 </div>
 
 </body>
