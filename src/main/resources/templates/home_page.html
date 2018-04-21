@@ -36,7 +36,7 @@
     <table align="center">
         <tr>
             <td width="400" valign="top">
-                <form>
+                <form  method="post" action="/quit_queue">
                     <table width="200" border="0" class="table table-striped" style="margin-top: 40px"
                            th:if="${partyQueues}">
                         <thead>
@@ -51,7 +51,9 @@
                             <td align="center" th:text="${queue.queueName}">
                             </td>
                             <td>
-                                <input type="checkbox">
+                                <label>
+                                    <input type="checkbox" th:value="${queue.queueId}" th:name="${iter.count}">
+                                </label>
                             </td>
                         </tr>
                     </table>

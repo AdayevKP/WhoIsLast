@@ -1,11 +1,14 @@
 package com.whoslast.entities;
 
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 
 
 @Entity
-@Table(name="List")// This tells Hibernate to make a table out of this class
+@Table(name="List", uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "queueId"}))// This tells Hibernate to make a table out of this class
 public class QueueRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -13,10 +16,12 @@ public class QueueRecord {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="queueId")
+    @OnDelete(action =  OnDeleteAction.CASCADE)
     private Queue queue;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="userId")
+    @OnDelete(action =  OnDeleteAction.CASCADE)
     private User user;
 
     private Integer number;

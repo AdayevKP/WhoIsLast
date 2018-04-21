@@ -2,12 +2,10 @@ package com.whoslast.controllers;
 import com.whoslast.entities.*;
 import com.whoslast.queue.QueueAvailableManager;
 import com.whoslast.queue.QueueCreatorManager;
-import com.whoslast.queue.QueueJoinManager;
 import com.whoslast.response.ErrorCodes;
 import com.whoslast.response.ServerResponse;
 import com.whoslast.authorization.SignUpManager;
 import com.whoslast.group.GroupManager;
-import groovy.util.MapEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -316,6 +314,22 @@ public class MainController {
             record.setUser(user);
             userQueueRepository.save(record);
         }
+
+        return "redirect:/home_page";
+    }
+
+    @PostMapping(path = "/quit_queue")
+    public String quitQueuePost(@RequestParam Map<String, String> map, Model model){
+        User user = userRepository.findUserByEmail(getCurrentEmail());
+        model = setRights(model, user);
+
+        for(String el: map.keySet()){
+            Queue queue = queueRepository.getQueueById(Integer.valueOf(map.get(el)));
+            QueueRecord record = userQueueRepository.findByQueueAndUser(queue, user);
+            record.setQueue(null);
+            record.setUser(null);
+            userQueueRepository.save(record);
+            }
 
         return "redirect:/home_page";
     }
