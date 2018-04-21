@@ -220,17 +220,6 @@ public class MainController {
         return ans;
     }
 
-    /*
-    @GetMapping(path = "/join_queue")
-    public @ResponseBody
-    String joinQueue(@RequestParam String queue_id, Model model) {
-        String email = getCurrentEmail();
-
-        QueueJoinManager queueJoinManager = new QueueJoinManager(userRepository, queueRepository, userQueueRepository);
-        ServerResponse response = queueJoinManager.join(new QueueJoinManager.QueueJoinData(email, queue_id));
-        return response.toString();
-    }
-    */
 
     @GetMapping(path = "/join_the_queue")
     String joinTheQueue(Model model){
@@ -245,39 +234,8 @@ public class MainController {
         return  "join_the_queue";
     }
 
-    /*
-    @GetMapping(path = "/available_user_queues")
-    public @ResponseBody
-    String getAvailableUserQueues(Model model) {
-        String email = getCurrentEmail();
-
-        ServerResponse response = getQueuesResponse(email, QueueAvailableManager.QueueAvailableMode.BY_USER);
-        if (response.isSuccess()) {
-            QueueAvailableManager.QueueAvailableList queues = (QueueAvailableManager.QueueAvailableList)response.getAdditionalData();
-            return queues.toString();
-        } else {
-            return response.toString();
-        }
-    }
-
-
-    @GetMapping(path = "/available_party_queues")
-    public @ResponseBody
-    String getAvailablePartyQueues(@RequestParam String party_id, Model model) {
-        ServerResponse response = getQueuesResponse(party_id, QueueAvailableManager.QueueAvailableMode.BY_PARTYID);
-        if (response.isSuccess()) {
-            QueueAvailableManager.QueueAvailableList queues = (QueueAvailableManager.QueueAvailableList)response.getAdditionalData();
-            return queues.toString();
-        } else {
-            return response.toString();
-        }
-    }
-    */
-
     @GetMapping(path = "/all")
     public String getAllUsers(Model model) {
-        //model.addAttribute("users", userRepository.findAll());
-        //model.addAttribute("msg", "from server with love");
         return "redirect:/home_page";
     }
 
@@ -312,7 +270,7 @@ public class MainController {
             model.addAttribute("userGroup", "Вы не состоите ни в одной из групп");
             //model.addAttribute("msg", "You are not a member of any group");
         }
-        return "user_home";
+        return "home_page";
     }
 
     @GetMapping(path = "/groupmates")
@@ -343,6 +301,22 @@ public class MainController {
         record.setQueue(queue);
         record.setUser(userRepository.findUserByEmail(getCurrentEmail()));
         userQueueRepository.save(record);
+        return "redirect:/home_page";
+    }
+
+    @PostMapping(path = "/enter_queue")
+    public String enterQueuePost(@RequestParam Map<String, String> map, Model model){
+        User user = userRepository.findUserByEmail(getCurrentEmail());
+        model = setRights(model, user);
+
+        for(String el: map.keySet()){
+            Queue queue = queueRepository.getQueueById(Integer.valueOf(map.get(el)));
+            QueueRecord record = new QueueRecord();
+            record.setQueue(queue);
+            record.setUser(user);
+            userQueueRepository.save(record);
+        }
+
         return "redirect:/home_page";
     }
 

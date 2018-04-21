@@ -67,13 +67,13 @@
 
             </td>
             <td width="400" valign="top">
-                <form>
+                <form method="post" action="/enter_queue">
                     <table width="200" border="0" class="table table-striped" style="margin-top: 40px"
                            th:if="${partyQueues}">
                         <thead class="thread-dark">
                         <tr>
                             <td class=bg-primary" colspan="2" align="center">
-                                <label><font color="black">Доступные очереди</font></label>
+                                <label><span style="color: black; ">Доступные очереди</span></label>
                             </td>
                         </tr>
                         </thead>
@@ -82,7 +82,9 @@
                             <!--th:onclick="'window.location.href = \'' + @{/enter_queue?id={id}(id=${queue.queueId})} + '\''"-->
                             <td align="center" th:if="${queue.queueName != null}" th:text="${queue.queueName}">1</td>
                             <td>
-                                <input type="checkbox">
+                                <label>
+                                    <input type="checkbox" th:value="${queue.queueId}" th:name="${iter.count}">
+                                </label>
                             </td>
                         </tr>
                     </table>
