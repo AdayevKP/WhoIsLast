@@ -78,8 +78,8 @@
                         </tr>
                         </thead>
                         <!--/*@thymesVar id="userQueues" type="java"*/-->
-                        <tr th:each="queue, iter : ${userQueues}"
-                            th:onclick="'window.location.href = \'' + @{/enter_queue?id={id}(id=${queue.queueId})} + '\''">
+                        <tr th:each="queue, iter : ${userQueues}">
+                            <!--th:onclick="'window.location.href = \'' + @{/enter_queue?id={id}(id=${queue.queueId})} + '\''"-->
                             <td align="center" th:if="${queue.queueName != null}" th:text="${queue.queueName}">1</td>
                             <td>
                                 <input type="checkbox">

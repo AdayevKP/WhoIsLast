@@ -6,7 +6,7 @@ function addline()
     var div = document.createElement('div');
     div.setAttribute("align", "center");
     div.setAttribute("class", "form-inline");
-    div.innerHTML = '<input style="margin-top: 5px" type="email" class="form-control" id="exampleInputEmail1" placeholder="email"> <button class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-minus"></span></button>';
+    div.innerHTML = '<input style="margin-top: 5px" type="email" name="inputEmail' + current + '" class="form-control" id="exampleInputEmail1" placeholder="email"> <button class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-minus"></span></button>';
     form.insertBefore(div, form.children[current]);
     current++;
     return false;
