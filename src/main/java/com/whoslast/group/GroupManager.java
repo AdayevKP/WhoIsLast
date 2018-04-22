@@ -74,7 +74,7 @@ public class GroupManager {
         Party foundGroup = partyDatabase.findGroupByName(groupName);
         ServerResponse response;
         if(foundUser == null){
-            response = new ServerResponse(msgNoSuchUser + ", login: " + email, ErrorCodes.Groups.NO_USER_IN_DB);
+            response = new ServerResponse(msgNoSuchUser, ErrorCodes.Groups.NO_USER_IN_DB);
         }
         else if(foundGroup == null){
             response = new ServerResponse(msgNoSuchGroup, ErrorCodes.Groups.NO_GROUP_IN_DB);

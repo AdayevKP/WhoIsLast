@@ -1,6 +1,6 @@
 package com.whoslast.controllers;
 
-import com.whoslast.configs.EmailServiceImpl;
+import com.whoslast.configs.MainConfig;
 import com.whoslast.entities.*;
 import com.whoslast.queue.QueueAvailableManager;
 import com.whoslast.queue.QueueCreatorManager;
@@ -9,7 +9,10 @@ import com.whoslast.response.ServerResponse;
 import com.whoslast.authorization.SignUpManager;
 import com.whoslast.group.GroupManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +22,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +50,8 @@ public class MainController {
     private PartyRepository partyRepository;
     @Autowired
     private SuperuserRepository suRepository;
+    @Autowired
+    private JavaMailSenderImpl mailSender;
 
     // @ResponseBody means the returned String is the response, not a view name
     // @RequestParam means it is a parameter from the GET or POST request
@@ -188,12 +195,11 @@ public class MainController {
     }
 
     @PostMapping(path = "/create_queue")
-    public String createQueue(@RequestParam(value = "GrName") String name, Model model) {
+    public String createQueue(@RequestParam(value = "GrName") String name, Model model){
         QueueCreatorManager manager = new QueueCreatorManager(queueRepository, partyQueueRepository);
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
 
-        //EmailServiceImpl emailService = new EmailServiceImpl();
 
         Party party = user.getPartyId();
         boolean error = false;
@@ -213,12 +219,32 @@ public class MainController {
                 }
             }
             manager.createNewQueue(name, user.getPartyId());
+            try {
+                sendNotifications(name, user);
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            }
             //emailService.sendSimpleMessage(getCurrentEmail(), "queue", "testing email service");
         }
         String ans = "redirect:/home_page";
         if (error)
             ans += "?error=true";
         return ans;
+    }
+
+    private void sendNotifications(String name, User user) throws MessagingException {
+        Iterable<User> groupmates  = userRepository.findGroupMates(user.getPartyId(), user.getUserId());
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper mailMsg = new MimeMessageHelper(mimeMessage);
+        mailMsg.setFrom("WhoIsLastQueueNotifier@gmail.com");
+
+        for(User student: groupmates){
+            mailMsg.setTo(student.getEmail());
+            mailMsg.setSubject("Оповещение о создании новой очереди");
+            mailMsg.setText("Создана новая очередь: " + name);
+            mailSender.send(mimeMessage);
+        }
     }
 
 

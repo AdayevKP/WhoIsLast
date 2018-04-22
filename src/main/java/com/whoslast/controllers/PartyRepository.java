@@ -19,4 +19,5 @@ public interface PartyRepository extends CrudRepository<Party, Long>{
     Party findPartyBySuperuserId(Integer id);
 
     Party findPartyByPartyId(Integer id);
+
 }
