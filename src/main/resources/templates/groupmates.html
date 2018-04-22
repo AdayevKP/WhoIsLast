@@ -14,7 +14,7 @@
             <small th:text="${queueName}" ></small>
         </h2>
     </div>
-    <div class="alert alert-danger" role="alert" th:if="${error} != null" th:text="${error}">
+    <div class="alert  alert-info" role="alert" th:if="${error} != null" th:text="${error}">
         <!--/*@thymesVar id="error" type="aj"*/-->
     </div>
     <table class="table table-striped " th:if="${error} == null">

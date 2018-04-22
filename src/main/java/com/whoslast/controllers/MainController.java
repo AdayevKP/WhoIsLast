@@ -1,4 +1,6 @@
 package com.whoslast.controllers;
+
+import com.whoslast.configs.EmailServiceImpl;
 import com.whoslast.entities.*;
 import com.whoslast.queue.QueueAvailableManager;
 import com.whoslast.queue.QueueCreatorManager;
@@ -48,8 +50,7 @@ public class MainController {
     // @RequestParam means it is a parameter from the GET or POST request
 
     @RequestMapping(path = "/signup", method = RequestMethod.GET)
-    public String signUpGet(Model model)
-    {
+    public String signUpGet(Model model) {
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
         return "sign_up";
@@ -77,9 +78,9 @@ public class MainController {
         Authentication authenticatedUser = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
 
-        if(response.getErrorCode() == ErrorCodes.NO_ERROR)
+        if (response.getErrorCode() == ErrorCodes.NO_ERROR)
             return "redirect:all";
-        else{
+        else {
             model.addAttribute("error", response.getMsg());
             return "sign_up";
         }
@@ -123,33 +124,33 @@ public class MainController {
         if (groupResponse != null)
             model.addAttribute("msg", groupResponse.getMsg());
 
-        return "groupmates";
+        return "redirect:/groupmates";
     }
 
     @GetMapping(path = "/add_user_to_group")
-    String addUserToGroup(Model model){
+    String addUserToGroup(Model model) {
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
 
-        return  "add_user_to_group";
+        return "add_user_to_group";
     }
 
     @GetMapping(path = "/")
-    String greetingPage(Model model){
+    String greetingPage(Model model) {
 
         model.addAttribute("logged", false);
         model.addAttribute("sueruser", false);
-        return  "start_page";
+        return "start_page";
     }
 
     @PostMapping(path = "/add_user_to_group")
-    String addUsertoGroupPost(@RequestParam Map<String, String> map, Model model){
+    String addUsertoGroupPost(@RequestParam Map<String, String> map, Model model) {
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
         Superuser suser = suRepository.findByUserId(user.getUserId());
 
         //if current user doesn't own group, return with error message
-        if(suser == null || !user.getUserId().equals(suser.getUserId())){
+        if (suser == null || !user.getUserId().equals(suser.getUserId())) {
             model.addAttribute("error", "Вы не владелец группы и не можете добавлять юзеров в группу");
             return "add_user_to_group";
         }
@@ -160,8 +161,8 @@ public class MainController {
         GroupManager manager = new GroupManager(partyRepository, userRepository, suRepository);
         ServerResponse response = null;
         List<String> addedUsers = new ArrayList<>();
-        for (String email : map.keySet()){
-            if(!map.get(email).isEmpty()) {
+        for (String email : map.keySet()) {
+            if (!map.get(email).isEmpty()) {
                 response = manager.AddUserToGroup(map.get(email), party.getName());
                 if (response.getErrorCode() != ErrorCodes.NO_ERROR) {
                     model.addAttribute("error", response);
@@ -171,7 +172,7 @@ public class MainController {
             }
         }
         StringBuilder msg = new StringBuilder(response.toString() + " : ");
-        for(String el: addedUsers){
+        for (String el : addedUsers) {
             msg.append(el).append(", ");
         }
         model.addAttribute("msg", msg);
@@ -179,7 +180,7 @@ public class MainController {
     }
 
     @GetMapping(path = "/create_queue")
-    public String createQueue(Model model){
+    public String createQueue(Model model) {
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
 
@@ -192,25 +193,27 @@ public class MainController {
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
 
+        //EmailServiceImpl emailService = new EmailServiceImpl();
+
         Party party = user.getPartyId();
         boolean error = false;
 
         //check whether user is party leader
-        if(!Objects.equals(user.getUserId(), party.getSuperuser().getUserId())){
+        if (!Objects.equals(user.getUserId(), party.getSuperuser().getUserId())) {
             error = true;
-            }
-        else {
+        } else {
             Iterable<Queue> queues = queueRepository.findByQueueName(name);
 
-            for (Queue q : queues){
+            for (Queue q : queues) {
                 PartyQueue records = partyQueueRepository.findByQueue(q);
 
-                if (records.getPartyId().getPartyId().equals(party.getPartyId())){
+                if (records.getPartyId().getPartyId().equals(party.getPartyId())) {
                     model.addAttribute("error", "группа с таким именем уже существует");
                     return "create_queue";
                 }
             }
             manager.createNewQueue(name, user.getPartyId());
+            //emailService.sendSimpleMessage(getCurrentEmail(), "queue", "testing email service");
         }
         String ans = "redirect:/home_page";
         if (error)
@@ -220,16 +223,14 @@ public class MainController {
 
 
     @GetMapping(path = "/join_the_queue")
-    String joinTheQueue(Model model){
+    String joinTheQueue(Model model) {
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
-
-        model.addAttribute("userName", user.getName());
-        model.addAttribute("userGroup", user.getPartyId().getSpeciality());
-        model.addAttribute("userQueues", queueRepository.getQueuesEntriesAvailableToUser(user.getPartyId().getPartyId(), user.getUserId()));
-        model.addAttribute("partyQueues", queueRepository.getQueuesEntriesUserAlreadyIn(user.getPartyId().getPartyId(), user.getUserId()));
-
-        return  "join_the_queue";
+        model = setAttributes(model, user);
+        if (user.getPartyId() == null) {
+            model.addAttribute("error", "Пользователь не состоит в группе");
+        }
+        return "join_the_queue";
     }
 
     @GetMapping(path = "/all")
@@ -247,32 +248,34 @@ public class MainController {
     }
 
     @GetMapping(path = "/home_page")
-    public String homePage(@RequestParam(value = "error", required = false) String error , Model model){
+    public String homePage(@RequestParam(value = "error", required = false) String error, Model model) {
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
 
 
-        if(error != null && error.equals("true"))
+        if (error != null && error.equals("true"))
             model.addAttribute("error", "You are not party leader, you can't create queue :(");
 
-        model.addAttribute("userName", user.getName());
-        model.addAttribute("email", user.getEmail());
-        Party party = user.getPartyId();
-        if(party != null) {
-
-            model.addAttribute("userGroup", user.getPartyId().getSpeciality());
-            model.addAttribute("userQueues", queueRepository.getQueuesEntriesAvailableToUser(user.getPartyId().getPartyId(), user.getUserId()));
-            model.addAttribute("partyQueues", queueRepository.getQueuesEntriesUserAlreadyIn(user.getPartyId().getPartyId(), user.getUserId()));
-        }
-        else{
-            model.addAttribute("userGroup", "Вы не состоите ни в одной из групп");
-            //model.addAttribute("msg", "You are not a member of any group");
-        }
+        model = setAttributes(model, user);
         return "home_page";
     }
 
+    private Model setAttributes(Model model, User user) {
+        model.addAttribute("userName", user.getName());
+        model.addAttribute("email", user.getEmail());
+        Party party = user.getPartyId();
+        if (party != null) {
+            model.addAttribute("userGroup", user.getPartyId().getSpeciality());
+            model.addAttribute("userQueues", queueRepository.getQueuesEntriesAvailableToUser(user.getPartyId().getPartyId(), user.getUserId()));
+            model.addAttribute("partyQueues", queueRepository.getQueuesEntriesUserAlreadyIn(user.getPartyId().getPartyId(), user.getUserId()));
+        } else {
+            model.addAttribute("userGroup", "Вы не состоите ни в одной из групп");
+        }
+        return model;
+    }
+
     @GetMapping(path = "/groupmates")
-    public String getGroupMates(Model model){
+    public String getGroupMates(Model model) {
         User currentUser = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, currentUser);
 
@@ -292,7 +295,7 @@ public class MainController {
     }
 
     @GetMapping(path = "/enter_queue")
-    public String enterQueue(@RequestParam(value = "id") Integer id){
+    public String enterQueue(@RequestParam(value = "id") Integer id) {
 
         Queue queue = queueRepository.getQueueById(id);
         QueueRecord record = new QueueRecord();
@@ -303,11 +306,11 @@ public class MainController {
     }
 
     @PostMapping(path = "/enter_queue")
-    public String enterQueuePost(@RequestParam Map<String, String> map, Model model){
+    public String enterQueuePost(@RequestParam Map<String, String> map, Model model) {
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
 
-        for(String el: map.keySet()){
+        for (String el : map.keySet()) {
             Queue queue = queueRepository.getQueueById(Integer.valueOf(map.get(el)));
             QueueRecord record = new QueueRecord();
             record.setQueue(queue);
@@ -319,28 +322,28 @@ public class MainController {
     }
 
     @PostMapping(path = "/quit_queue")
-    public String quitQueuePost(@RequestParam Map<String, String> map, Model model){
+    public String quitQueuePost(@RequestParam Map<String, String> map, Model model) {
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
 
-        for(String el: map.keySet()){
+        for (String el : map.keySet()) {
             Queue queue = queueRepository.getQueueById(Integer.valueOf(map.get(el)));
             QueueRecord record = userQueueRepository.findByQueueAndUser(queue, user);
             record.setQueue(null);
             record.setUser(null);
             userQueueRepository.save(record);
-            }
+        }
 
         return "redirect:/home_page";
     }
 
     @GetMapping(path = "/queue")
-    public String queueUserList(@RequestParam(value = "id") Integer id, Model model){
+    public String queueUserList(@RequestParam(value = "id") Integer id, Model model) {
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
         List<Integer> ids = queueRepository.findAllUsersInQueue(id);
         List<User> users = new ArrayList<>();
-        for (int el: ids){
+        for (int el : ids) {
             users.add(userRepository.findUserById(el).iterator().next());
         }
         model.addAttribute("users", users);
@@ -350,18 +353,16 @@ public class MainController {
     }
 
 
-    private Model setRights(Model model, User user){
+    private Model setRights(Model model, User user) {
         //rights for displaying buttons
-        if(user != null) {
-
+        if (user != null) {
 
             model.addAttribute("logged", true);
             if (suRepository.findByUserId(user.getUserId()) != null)
                 model.addAttribute("superuser", true);
             else
                 model.addAttribute("superuser", false);
-        }
-        else{
+        } else {
             model.addAttribute("logged", false);
             model.addAttribute("superuser", false);
         }

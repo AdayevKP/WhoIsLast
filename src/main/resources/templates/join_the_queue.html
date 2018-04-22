@@ -2,7 +2,10 @@
 <div th:replace="base :: header"></div>
 
 <div class="container" style="margin-top: 30px">
-    <table align="center" width="1000" border="1" class="table" style="margin-top: 40px">
+    <div class="alert  alert-info" role="alert" th:if="${error} != null" th:text="${error}">
+        <!--/*@thymesVar id="error" type="aj"*/-->
+    </div>
+    <table align="center" width="1000" border="1" class="table" style="margin-top: 40px" th:if="${error == null}">
         <thead class="thread-dark">
         <tr bgcolor="#6495ed">
             <th scope="col" align="center">#</th>
@@ -19,11 +22,11 @@
         </tbody>
     </table>
 
-        <table align="center" width="1000" border="1" class="table">
+        <table align="center" width="1000" border="1" class="table" th:if="${error == null}">
 
             <thead class="thread-dark">
             <tr bgcolor="#6495ed">
-                <th scope="col" align="center" style="po">Доступные очереди</th>
+                <th scope="col" align="center">Доступные очереди</th>
             </tr>
             </thead>
             <tbody>
