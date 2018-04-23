@@ -228,7 +228,13 @@ public class MainController {
             try {
                 sendNotifications(name, user);
             } catch (MessagingException e) {
-                e.printStackTrace();
+
+            }
+            finally {
+                String ans = "redirect:/home_page";
+                if (error)
+                    ans += "?error=true";
+                return ans;
             }
             //emailService.sendSimpleMessage(getCurrentEmail(), "queue", "testing email service");
         }
