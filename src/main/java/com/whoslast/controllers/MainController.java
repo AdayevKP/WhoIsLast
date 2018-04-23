@@ -164,7 +164,7 @@ public class MainController {
 
         Party party = partyRepository.findPartyBySuperuserId(suser.getId());
 
-        System.out.println(map.toString());
+        String error = "";
         GroupManager manager = new GroupManager(partyRepository, userRepository, suRepository);
         ServerResponse response = null;
         List<String> addedUsers = new ArrayList<>();
@@ -172,13 +172,19 @@ public class MainController {
             if (!map.get(email).isEmpty()) {
                 response = manager.AddUserToGroup(map.get(email), party.getName());
                 if (response.getErrorCode() != ErrorCodes.NO_ERROR) {
-                    model.addAttribute("error", response);
-                    return "add_user_to_group";
+                    if (error.isEmpty())
+                        error = response.getMsg() + ": ";
+                    error += map.get(email) + " ";
+                    //model.addAttribute("error", response + ": " + map.get(email));
+                } else {
+                    addedUsers.add(map.get(email));
                 }
-                addedUsers.add(map.get(email));
             }
         }
-        StringBuilder msg = new StringBuilder(response.toString() + " : ");
+        if (!error.isEmpty()) {
+            model.addAttribute("error", error);
+        }
+        StringBuilder msg = new StringBuilder("Успешно добавлены пользователи" + " : ");
         for (String el : addedUsers) {
             msg.append(el).append(", ");
         }
@@ -195,7 +201,7 @@ public class MainController {
     }
 
     @PostMapping(path = "/create_queue")
-    public String createQueue(@RequestParam(value = "GrName") String name, Model model){
+    public String createQueue(@RequestParam(value = "GrName") String name, Model model) {
         QueueCreatorManager manager = new QueueCreatorManager(queueRepository, partyQueueRepository);
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
@@ -233,13 +239,13 @@ public class MainController {
     }
 
     private void sendNotifications(String name, User user) throws MessagingException {
-        Iterable<User> groupmates  = userRepository.findGroupMates(user.getPartyId(), user.getUserId());
+        Iterable<User> groupmates = userRepository.findGroupMates(user.getPartyId(), user.getUserId());
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper mailMsg = new MimeMessageHelper(mimeMessage);
         mailMsg.setFrom("WhoIsLastQueueNotifier@gmail.com");
 
-        for(User student: groupmates){
+        for (User student : groupmates) {
             mailMsg.setTo(student.getEmail());
             mailMsg.setSubject("Оповещение о создании новой очереди");
             mailMsg.setText("Создана новая очередь: " + name);
@@ -373,7 +379,7 @@ public class MainController {
             users.add(userRepository.findUserById(el).iterator().next());
         }
         model.addAttribute("users", users);
-        model.addAttribute("groupName", users.get(0).getPartyId().getName());
+        model.addAttribute("groupName", user.getPartyId().getName());
         model.addAttribute("queueName", queueRepository.getQueueById(id).getQueueName());
         return "groupmates";
     }
