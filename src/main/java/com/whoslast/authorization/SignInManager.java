@@ -50,8 +50,16 @@ public class SignInManager extends AuthManager {
      * Exception, happened during sign in procedure
      */
     private class SignInException extends Exception {
+        Integer errorCode;
+
         private SignInException(String s) {
             super(s);
+            this.errorCode = ErrorCodes.NO_ERROR;
+        }
+
+        private SignInException(String s, Integer errorCode) {
+            super(s);
+            this.errorCode = errorCode;
         }
     }
 
@@ -59,6 +67,7 @@ public class SignInManager extends AuthManager {
     private static final String msgSignInErrorCredentials = "Wrong pair of e-mail/password";
     private static final String msgSignInErrorEmptyFields = "Some of provided fields are empty";
     private static final String msgSignInErrorEnvironment = "Environment fail";
+    private static final String msgSignInNotActivated = "The account is not activated";
 
     public SignInManager(UserRepository userDatabase) {
         super(userDatabase);
@@ -74,8 +83,10 @@ public class SignInManager extends AuthManager {
         User user = userDatabase.findUserByEmail(signInData.getEmail());
         CredentialsManager.Credentials credentials;
         if (user == null)
-            throw new SignInException(msgSignInErrorCredentials);
+            throw new SignInException(msgSignInErrorCredentials, ErrorCodes.Authorization.WRONG_CREDENTIALS);
         else
+            if (user.getRegistrationCode() != null)
+                throw new SignInException(msgSignInNotActivated, ErrorCodes.Authorization.NOT_ACTIVATED);
             credentials = new CredentialsManager.Credentials(user.getHash(), user.getSalt(), user.getHashSize());
         return credentials;
     }
@@ -89,17 +100,20 @@ public class SignInManager extends AuthManager {
         ServerResponse response;
         try {
             if (signInData.hasEmptyFields())
-                throw new SignInException(msgSignInErrorEmptyFields);
+                throw new SignInException(msgSignInErrorEmptyFields, ErrorCodes.Authorization.WRONG_CREDENTIALS);
             CredentialsManager.Credentials credentials = getCredentials(signInData);
             if (!CredentialsManager.verifyPassword(signInData.getPassword(), credentials))
-                throw new SignInException(msgSignInErrorCredentials);
+                throw new SignInException(msgSignInErrorCredentials, ErrorCodes.Authorization.WRONG_CREDENTIALS);
             response = new ServerResponse(msgSignInSuccess, ErrorCodes.NO_ERROR);
         }
         catch (CredentialsManager.HashEnginePerformException e){
             response = new ServerResponse(msgSignInErrorEnvironment, ErrorCodes.Authorization.ENVIRONMENT_FAIL);
         }
-        catch (CredentialsManager.BadPasswordException | SignInException e){
+        catch (CredentialsManager.BadPasswordException e){
             response = new ServerResponse(msgSignInErrorCredentials, ErrorCodes.Authorization.WRONG_CREDENTIALS);
+        }
+        catch (SignInException e) {
+            response = new ServerResponse(e.getMessage(), e.errorCode);
         }
         return response;
     }

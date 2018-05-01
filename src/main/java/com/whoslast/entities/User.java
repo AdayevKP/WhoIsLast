@@ -24,6 +24,8 @@ public class User {
     @JoinColumn(name="partyId")
     private Party party;
 
+    private String registrationCode;
+
     public Integer getUserId() {
         return userId;
     }
@@ -80,5 +82,10 @@ public class User {
         this.party = party;
     }
 
+    public boolean isEnabled() { return this.registrationCode == null; }
+
+    public String getRegistrationCode() { return registrationCode; }
+
+    public void setRegistrationCode(String regCode) { this.registrationCode = regCode; }
 }
 

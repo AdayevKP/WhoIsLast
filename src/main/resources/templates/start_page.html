@@ -6,6 +6,10 @@
     <h1 align="middle">Добро пожаловать!</h1>
     <h2 align="middle">Вы находитесь на сервисе для создания очередей</h2>
 
+    <div class="alert alert-info" role="alert" th:if="${notification} != null" th:text="${notification}">
+        <!--/*@thymesVar id="notification" type="aj"*/-->
+    </div>
+
     <form action="/signup">
         <div align="center">
             <button type="submit" class="btn btn-primary btn-lg">Зарегистрироваться</button>

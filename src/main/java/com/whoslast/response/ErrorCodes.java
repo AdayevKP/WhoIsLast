@@ -19,6 +19,7 @@ public abstract class ErrorCodes {
         public static final int ENVIRONMENT_FAIL = 31;
         public static final int BAD_PASSWORD = 32;
         public static final int WRONG_CREDENTIALS = 33;
+        public static final int NOT_ACTIVATED = 34;
     }
 
     //GROUPS ERROR CODES

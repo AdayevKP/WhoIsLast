@@ -76,20 +76,56 @@ public class MainController {
         SignUpManager.UserSignUpData signUpData = new SignUpManager.UserSignUpData(name, email, password);
         ServerResponse response = signUpManager.signUp(signUpData);
 
-
+        /* //Закомментил авто-вход, так как нужно подтвердить e-mail
         //auto login in current session
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(email, password);
         // generate session if one doesn't exist
         request.getSession();
         token.setDetails(new WebAuthenticationDetails(request));
         Authentication authenticatedUser = authenticationManager.authenticate(token);
-        SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
+        SecurityContextHolder.getContext().setAuthentication(authenticatedUser);*/
 
-        if (response.getErrorCode() == ErrorCodes.NO_ERROR)
-            return "redirect:all";
-        else {
+        if (response.getErrorCode() == ErrorCodes.NO_ERROR) {
+            user = (User) response.getAdditionalData();
+            try {
+                sendConfirmationMessage(request.getHeader("host"), (User) response.getAdditionalData());
+            } catch (MessagingException e) {
+                model.addAttribute("error", "Проблема с отправкой e-mail. Повторите регистрацию");
+                userRepository.delete(user);
+                return "sign_up";
+            }
+            model.addAttribute("notification", "Для окончания регистрации подтвердите свой e-mail (проверьте электронную почту)");
+            return "start_page";
+        } else {
             model.addAttribute("error", response.getMsg());
             return "sign_up";
+        }
+    }
+
+    private void sendConfirmationMessage(String host, User user) throws MessagingException {
+        String link = "http://" + host + "/verify?email="+user.getEmail()+"&registrationCode="+user.getRegistrationCode();
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper mailMsg = new MimeMessageHelper(mimeMessage);
+        mailMsg.setFrom("WhoIsLastQueueNotifier@gmail.com");
+
+        mailMsg.setTo(user.getEmail());
+        mailMsg.setSubject("Подтверждение регистрации");
+        mailMsg.setText("Ваш логин: "+ user.getName() +"\nДля подтверждения регистрации перейдите по ссылке: " + link + "\nВы будете перенаправлены на страницу входа");
+        mailSender.send(mimeMessage);
+    }
+
+    @RequestMapping(path = "/verify", method = RequestMethod.GET)
+    public String verifyEmail(String email, String registrationCode, Model model) {
+        User user = userRepository.findUserByEmail(email);
+        if (user != null && user.getRegistrationCode() != null && user.getRegistrationCode().equals(registrationCode)) {
+            user.setRegistrationCode(null);
+            userRepository.save(user);
+            model.addAttribute("notification", "Успешное подтверждение e-mail!");
+            return "sign_in";
+        } else {
+            model.addAttribute("error", "Недействительная ссылка подтверждения e-mail");
+            return "sign_in";
         }
     }
 
@@ -97,8 +133,10 @@ public class MainController {
     public String signInGet(@RequestParam(value = "error", required = false) String error, Model model) {
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
-        if (error != null)
-            model.addAttribute("error", "неверные логин и/или пароль");
+        if (error != null) {
+            model.addAttribute("error", "Ошибка входа");
+            model.addAttribute("notification", "Возможно, этот аккаунт не был активирован");
+        }
         return "sign_in";
     }
 
@@ -144,9 +182,8 @@ public class MainController {
 
     @GetMapping(path = "/")
     String greetingPage(Model model) {
-
         model.addAttribute("logged", false);
-        model.addAttribute("sueruser", false);
+        model.addAttribute("superuser", false);
         return "start_page";
     }
 
@@ -258,7 +295,6 @@ public class MainController {
             mailSender.send(mimeMessage);
         }
     }
-
 
     @GetMapping(path = "/join_the_queue")
     String joinTheQueue(Model model) {

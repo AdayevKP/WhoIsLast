@@ -5,6 +5,8 @@ import com.whoslast.controllers.UserRepository;
 import com.whoslast.entities.User;
 import com.whoslast.response.ServerResponse;
 
+import java.util.Random;
+
 /**
  * Sign-up manager
  */
@@ -60,6 +62,8 @@ public class SignUpManager extends AuthManager {
     private static final String msgSignUpErrorEmptyFields = "Some of provided fields are empty";
     private static final String msgSignUpErrorUserExists = "A user with provided email already exists";
 
+    private static final int REG_CODE_SIZE = 18;
+
     private int initialPartyId; //Value used while signing up to make user unbounded from any groups (but he has to do it after) ("dummy value")
 
     public SignUpManager(UserRepository userDatabase) {
@@ -85,12 +89,24 @@ public class SignUpManager extends AuthManager {
 
         newDatabaseUser.setName(signUpData.getName());
         newDatabaseUser.setEmail(signUpData.getEmail());
-        //newDatabaseUser.setGroupId(null);
         newDatabaseUser.setSalt(credentials.getSalt());
         newDatabaseUser.setHash(credentials.getHash());
         newDatabaseUser.setHashSize(credentials.getHashSize());
+        newDatabaseUser.setRegistrationCode(getRegistrationCode());
 
         return  newDatabaseUser;
+    }
+
+    private String getRegistrationCode() {
+        String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        StringBuilder stringBuilder = new StringBuilder();
+        Random rnd = new Random();
+        while (stringBuilder.length() < REG_CODE_SIZE) {
+            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+            stringBuilder.append(SALTCHARS.charAt(index));
+        }
+        String code = stringBuilder.toString();
+        return code;
     }
 
     /**
@@ -108,7 +124,7 @@ public class SignUpManager extends AuthManager {
                 if (foundUser == null) {
                     User newDatabaseUser = buildDatabaseUser(signUpData);
                     userDatabase.save(newDatabaseUser);
-                    response = new ServerResponse(msgSignUpSuccess, ErrorCodes.NO_ERROR);
+                    response = new ServerResponse(msgSignUpSuccess, ErrorCodes.NO_ERROR, newDatabaseUser);
                 } else {
                     response = new ServerResponse(msgSignUpErrorUserExists, ErrorCodes.Users.USER_EXISTS);
                 }
