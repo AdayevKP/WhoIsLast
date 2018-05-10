@@ -31,7 +31,7 @@
 
 4. Подгрузить репозиторий из CVS Git внутри IntelliJ IDEA (версия Ultimate) - VCS - Checkout from version control - Github (ветка master), в настройках проекта указать путь к Gradle;
 
-5. В файле resources/application.properties.jdk надо поменять логин и пароль от бд на свои;
+5. В файле resources/application.properties.jdk надо поменять логин и пароль и название бд на свои;
 
 6. Запустить проект.
 
