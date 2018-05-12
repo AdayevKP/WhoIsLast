@@ -60,7 +60,7 @@ public class SignUpManager extends AuthManager {
 
     private static final String msgSignUpSuccess = "Successful sign up";
     private static final String msgSignUpErrorEmptyFields = "Some of provided fields are empty";
-    private static final String msgSignUpErrorUserExists = "A user with provided email already exists";
+    private static final String msgSignUpErrorUserExists = "Пользователь с такой почтой уже существует";
 
     private static final int REG_CODE_SIZE = 18;
 

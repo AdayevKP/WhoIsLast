@@ -1,6 +1,5 @@
 package com.whoslast.controllers;
 
-import com.whoslast.configs.MainConfig;
 import com.whoslast.entities.*;
 import com.whoslast.queue.QueueAvailableManager;
 import com.whoslast.queue.QueueCreatorManager;
@@ -9,23 +8,17 @@ import com.whoslast.response.ServerResponse;
 import com.whoslast.authorization.SignUpManager;
 import com.whoslast.group.GroupManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,9 +58,9 @@ public class MainController {
     }
 
     @RequestMapping(path = "/signup", method = RequestMethod.POST)
-    public String signUpPost(@RequestParam(value = "inputEmail", required = true) String email,
-                             @RequestParam(value = "inputPassword", required = true) String password,
-                             @RequestParam(value = "inputName", required = true) String name,
+    public String signUpPost(@RequestParam(value = "inputEmail") String email,
+                             @RequestParam(value = "inputPassword") String password,
+                             @RequestParam(value = "inputName") String name,
                              HttpServletRequest request, Model model) {
 
         User user = userRepository.findUserByEmail(getCurrentEmail());
@@ -202,30 +195,32 @@ public class MainController {
 
         Party party = partyRepository.findPartyBySuperuserId(suser.getId());
 
-        String error = "";
+        StringBuilder error = new StringBuilder();
         GroupManager manager = new GroupManager(partyRepository, userRepository, suRepository);
-        ServerResponse response = null;
+        ServerResponse response;
         List<String> addedUsers = new ArrayList<>();
         for (String email : map.keySet()) {
             if (!map.get(email).isEmpty()) {
                 response = manager.AddUserToGroup(map.get(email), party.getName());
                 if (response.getErrorCode() != ErrorCodes.NO_ERROR) {
-                    if (error.isEmpty())
-                        error = response.getMsg() + ": ";
-                    error += map.get(email) + " ";
+                    if (error.length() == 0)
+                        error = new StringBuilder(response.getMsg() + ": ");
+                    error.append(map.get(email)).append(" ");
                     //model.addAttribute("error", response + ": " + map.get(email));
                 } else {
                     addedUsers.add(map.get(email));
                 }
             }
         }
-        if (!error.isEmpty()) {
-            model.addAttribute("error", error);
+        if (error.length() > 0) {
+            model.addAttribute("error", error.toString());
         }
         StringBuilder msg = new StringBuilder("Успешно добавлены пользователи" + " : ");
         for (String el : addedUsers) {
             msg.append(el).append(", ");
         }
+
+        if(!addedUsers.isEmpty())
         model.addAttribute("msg", msg);
         return "add_user_to_group";
     }
@@ -262,6 +257,7 @@ public class MainController {
                     return "create_queue";
                 }
             }
+            manager.createNewQueue(name, party);
             new Thread(() -> {
                 try {
                     sendNotifications(name, user);
@@ -269,17 +265,9 @@ public class MainController {
                     System.out.println("no internet connection");
                 }
             }).start();
-            String ans = "redirect:/home_page";
-            if (error)
-                ans += "?error=true";
-            return ans;
-
-            //emailService.sendSimpleMessage(getCurrentEmail(), "queue", "testing email service");
+            return "redirect:/home_page";
         }
-        String ans = "redirect:/home_page";
-        if (error)
-            ans += "?error=true";
-        return ans;
+        return "redirect:/home_page?error=true";
     }
 
     private void sendNotifications(String name, User user) throws MessagingException {

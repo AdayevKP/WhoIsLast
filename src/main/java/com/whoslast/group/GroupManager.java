@@ -16,7 +16,7 @@ public class GroupManager {
 
     private static final String msgSuccessCreated = "Successful group creation";
     private static final String msgSuccessAddedUser = "Пользователь успешно добавлен";
-    private static final String msgFailYouInGroup = "Can't create new group because you already in other group";
+    private static final String msgFailYouInGroup = "Нельзя создать группу, вы состоите в другой группе";
     private static final String msgFailGroupExists = "Группа с таким именем уже существует";
     private static final String msgNoSuchUser = "Не существует пользователя с таким логином";
     private static final String msgNoSuchGroup = "There is no group with this name";
@@ -83,10 +83,10 @@ public class GroupManager {
             if(foundUser.getPartyId() == null) {
                 foundUser.setGroupId(foundGroup);
                 userDatabase.save(foundUser);
-                response = new ServerResponse(msgSuccessAddedUser + ", login: " + email, ErrorCodes.NO_ERROR);
+                response = new ServerResponse(msgSuccessAddedUser, ErrorCodes.NO_ERROR);
             }
             else{
-                response = new ServerResponse(msgFailUserInGroup + ", login: " + email, ErrorCodes.Groups.USER_ALREADY_IN_GROUP);
+                response = new ServerResponse(msgFailUserInGroup, ErrorCodes.Groups.USER_ALREADY_IN_GROUP);
             }
         }
         return response;
