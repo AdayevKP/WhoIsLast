@@ -79,6 +79,8 @@ public class MainController {
         Authentication authenticatedUser = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(authenticatedUser);*/
 
+
+
         if (response.getErrorCode() == ErrorCodes.NO_ERROR) {
             user = (User) response.getAdditionalData();
             try {
