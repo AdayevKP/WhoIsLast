@@ -386,6 +386,24 @@ public class MainController {
         return "redirect:/home_page";
     }
 
+    @PostMapping(path = "/delete_queue")
+    public String deleteQueue(@RequestParam Map<String, String> map, Model model){
+        User user = userRepository.findUserByEmail(getCurrentEmail());
+        model = setRights(model, user);
+        model = setAttributes(model, user);
+        if(user.getPartyId().getSuperuser().getUserId() != user.getUserId())
+            model.addAttribute("error", "Пользователь не является старостой группы");
+        else {
+            for (String el: map.keySet()){
+                Queue queue = queueRepository.getQueueById(Integer.valueOf(map.get(el)));
+                PartyQueue pq = partyQueueRepository.findByQueue(queue);
+                partyQueueRepository.delete(pq);
+                queueRepository.delete(queue);
+                }
+        }
+        return "join_the_queue";
+    }
+
     @PostMapping(path = "/quit_queue")
     public String quitQueuePost(@RequestParam Map<String, String> map, Model model) {
         User user = userRepository.findUserByEmail(getCurrentEmail());

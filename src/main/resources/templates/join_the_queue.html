@@ -5,13 +5,13 @@
     <h1 align="center">
         Ваши очереди
     </h1>
-    <div class="alert  alert-info" role="alert" th:if="${error} != null" th:text="${error}">
+    <div class="alert  alert-warning" role="alert" th:if="${error} != null" th:text="${error}">
         <!--/*@thymesVar id="error" type="aj"*/-->
     </div>
     <table align="center">
         <tr>
             <td width="400" valign="top">
-                <form  method="post" action="/quit_queue">
+                <form  method="post" action="/delete_queue">
                     <table width="200" border="0" class="table table-striped" style="margin-top: 40px"
                            th:if="${partyQueues}">
                         <thead>
@@ -44,7 +44,7 @@
 
             </td>
             <td width="400" valign="top">
-                <form method="post" action="/enter_queue">
+                <form method="post" action="/delete_queue">
                     <table width="200" border="0" class="table table-striped" style="margin-top: 40px"
                            th:if="${partyQueues}">
                         <thead class="thread-dark">

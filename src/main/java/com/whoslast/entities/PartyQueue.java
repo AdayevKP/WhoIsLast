@@ -1,6 +1,9 @@
 package com.whoslast.entities;
 
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 
 
@@ -10,8 +13,9 @@ public class PartyQueue {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer recordId;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="queueId")
+    @OnDelete(action =  OnDeleteAction.CASCADE)
     private Queue queue;
 
     @ManyToOne
