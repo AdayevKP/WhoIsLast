@@ -63,11 +63,10 @@
                             class="glyphicon glyphicon-plus"></span> Создать группу</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li th:if="${logged == false}"><a href="/signup"><span class="glyphicon glyphicon-user"></span> Sign
-                        Up</a></li>
+                    <li th:if="${logged == false}"><a href="/signup"><span class="glyphicon glyphicon-user"></span> Зарегистрироваться</a></li>
                     <li th:if="${logged == false}"><a href="/signin"><span class="glyphicon glyphicon-log-in"></span>
-                        Login</a></li>
-                    <li th:if="${logged}"><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+                        Войти</a></li>
+                    <li th:if="${logged}"><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Выйти</a>
                     </li>
                 </ul>
             </div>
