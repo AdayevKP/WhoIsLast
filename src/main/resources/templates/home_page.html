@@ -8,6 +8,10 @@
         <!--/*@thymesVar id="error" type="aj"*/-->
     </div>
 
+    <div class="alert alert-info" role="alert" th:if="${notification} != null" th:text="${notification}">
+        <!--/*@thymesVar id="notification" type="aj"*/-->
+    </div>
+
 
     <table align="center" width="500" border="1" class="table-responsive">
         <tr>
