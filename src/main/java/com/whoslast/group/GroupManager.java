@@ -1,9 +1,11 @@
 package com.whoslast.group;
+import com.whoslast.controllers.QueueRepository;
 import com.whoslast.response.ErrorCodes;
 import com.whoslast.response.ServerResponse;
 import com.whoslast.controllers.SuperuserRepository;
 import com.whoslast.controllers.UserRepository;
 import com.whoslast.entities.Party;
+import com.whoslast.entities.Queue;
 
 import com.whoslast.controllers.PartyRepository;
 import com.whoslast.entities.Superuser;
@@ -12,6 +14,7 @@ import com.whoslast.entities.User;
 public class GroupManager {
     private PartyRepository partyDatabase;
     private UserRepository userDatabase;
+    private QueueRepository queueRepository;
     private SuperuserRepository suDatabase;
 
     private static final String msgSuccessCreated = "Successful group creation";
@@ -22,11 +25,16 @@ public class GroupManager {
     private static final String msgNoSuchGroup = "There is no group with this name";
     private static final String msgAccessViolation = "Вы не владелец группы";
     private static final String msgFailUserInGroup = "Нельзя добавить пользователя, он уже состоит в другой группе";
+    private static final String msgFailNotInGroup = "Пользователь не состоит ни в одной из групп";
+    private static final String msgFailStillInQueues = "Для того, чтобы удалиться из группы, необходимо удалиться из всех очередей";
+    private static final String msgFailSuperuser = "Создатель группы не может из нее выйти";
+    private static final String msgSuccessDeleteUser = "Пользователь успешно удален из группы";
 
-    public GroupManager(PartyRepository partyDatabase, UserRepository userDatabase, SuperuserRepository suDatabase) {
+    public GroupManager(PartyRepository partyDatabase, UserRepository userDatabase, SuperuserRepository suDatabase, QueueRepository queueRepository) {
         this.partyDatabase = partyDatabase;
         this.userDatabase = userDatabase;
         this.suDatabase = suDatabase;
+        this.queueRepository = queueRepository;
     }
 
     private Party newGroupBuild(String grName, String userEmail)
@@ -90,5 +98,20 @@ public class GroupManager {
             }
         }
         return response;
+    }
+
+    public ServerResponse DeleteUserFromGroup(String email) {
+        User foundUser = userDatabase.findUserByEmail(email);
+        if (foundUser.getPartyId() == null)
+            return new ServerResponse(msgFailNotInGroup, ErrorCodes.Groups.NOT_IN_GROUP);
+        Superuser superuser = suDatabase.findByUserId(foundUser.getUserId());
+        if (superuser != null)
+            return new ServerResponse(msgFailSuperuser, ErrorCodes.Users.YOU_ARE_SUPERUSER);
+        Iterable<Queue> queues = queueRepository.getQueuesEntriesUserAlreadyIn(foundUser.getPartyId().getPartyId(), foundUser.getUserId());
+        if (queues.iterator().hasNext())
+            return new ServerResponse(msgFailStillInQueues, ErrorCodes.Queues.STILL_IN_QUEUE);
+        foundUser.setGroupId(null);
+        userDatabase.save(foundUser);
+        return new ServerResponse(msgSuccessDeleteUser, ErrorCodes.NO_ERROR);
     }
 }

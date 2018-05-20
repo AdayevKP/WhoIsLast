@@ -15,12 +15,15 @@ public interface UserRepository extends CrudRepository<User, Long> {
     User findUserByNameStartingWith(String name);
 
     //Get user tuple by email
-    @Query(value = "SELECT * FROM users WHERE email=?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM users WHERE email=?1 AND registration_code IS NULL", nativeQuery = true)
     User findUserByEmail(String email);
 
-    @Query(value = "SELECT * FROM users WHERE user_id=?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM users WHERE email=?1", nativeQuery = true)
+    User findUnverifiedUserByEmail(String email);
+
+    @Query(value = "SELECT * FROM users WHERE user_id=?1 AND registration_code IS NULL", nativeQuery = true)
     Iterable<User> findUserById(Integer id);
 
-    @Query(value = "SELECT * FROM users WHERE party_id=?1 AND NOT user_id=?2 ", nativeQuery = true)
+    @Query(value = "SELECT * FROM users WHERE party_id=?1 AND NOT user_id=?2 AND registration_code IS NULL", nativeQuery = true)
     Iterable<User> findGroupMates(Party partyId, Integer currentUserId);
 }

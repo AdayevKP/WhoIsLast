@@ -113,7 +113,7 @@ public class MainController {
 
     @RequestMapping(path = "/verify", method = RequestMethod.GET)
     public String verifyEmail(String email, String registrationCode, Model model) {
-        User user = userRepository.findUserByEmail(email);
+        User user = userRepository.findUnverifiedUserByEmail(email);
         if (user != null && user.getRegistrationCode() != null && user.getRegistrationCode().equals(registrationCode)) {
             user.setRegistrationCode(null);
             userRepository.save(user);
@@ -127,11 +127,10 @@ public class MainController {
 
     @RequestMapping(path = "/signin", method = RequestMethod.GET)
     public String signInGet(@RequestParam(value = "error", required = false) String error, Model model) {
-        User user = userRepository.findUserByEmail(getCurrentEmail());
+        User user = userRepository.findUnverifiedUserByEmail(getCurrentEmail());
         model = setRights(model, user);
         if (error != null) {
-            model.addAttribute("error", "Ошибка входа");
-            model.addAttribute("notification", "Возможно, этот аккаунт не был активирован");
+            model.addAttribute("error", "Ошибка входа. Неверный логин/пароль, либо аккаунт не был активирован");
         }
         return "sign_in";
     }
@@ -159,7 +158,7 @@ public class MainController {
 
         ServerResponse groupResponse = null;
         String email = getCurrentEmail();
-        GroupManager groupManager = new GroupManager(partyRepository, userRepository, suRepository);
+        GroupManager groupManager = new GroupManager(partyRepository, userRepository, suRepository, queueRepository);
         groupResponse = groupManager.NewGroup(email, grName);
 
         if (groupResponse != null)
@@ -198,7 +197,7 @@ public class MainController {
         Party party = partyRepository.findPartyBySuperuserId(suser.getId());
 
         StringBuilder error = new StringBuilder();
-        GroupManager manager = new GroupManager(partyRepository, userRepository, suRepository);
+        GroupManager manager = new GroupManager(partyRepository, userRepository, suRepository, queueRepository);
         ServerResponse response;
         List<String> addedUsers = new ArrayList<>();
         for (String email : map.keySet()) {
@@ -355,7 +354,6 @@ public class MainController {
             else
                 model.addAttribute("users", users);
         }
-
         return "groupmates";
     }
 
@@ -433,6 +431,30 @@ public class MainController {
         model.addAttribute("groupName", user.getPartyId().getName());
         model.addAttribute("queueName", queueRepository.getQueueById(id).getQueueName());
         return "groupmates";
+    }
+
+    @PostMapping(path = "/quit_group")
+    public String quitFromGroup(Model model) {
+        User user = userRepository.findUserByEmail(getCurrentEmail());
+        model = setRights(model, user);
+
+        GroupManager manager = new GroupManager(partyRepository, userRepository, suRepository, queueRepository);
+        ServerResponse response;
+        response = manager.DeleteUserFromGroup(getCurrentEmail());
+
+        if (!response.isSuccess()) {
+            String errorMessage = "Ошибка";
+            if (response.getErrorCode() == ErrorCodes.Groups.NOT_IN_GROUP)
+                errorMessage = "Вы не состоите ни в одной из групп";
+            if (response.getErrorCode() == ErrorCodes.Queues.STILL_IN_QUEUE)
+                errorMessage = "Вы не вышли из очередей перед выходом из группы. Подтвердите намерение выхода из группы удалением из очередей";
+            if (response.getErrorCode() == ErrorCodes.Users.YOU_ARE_SUPERUSER)
+                errorMessage = "Вы не можете выйти из группы, так как являетесь ее создателем";
+            model.addAttribute("error", errorMessage);
+        } else
+            model.addAttribute("notification", "Успешный выход из группы");
+        model = setAttributes(model, user);
+        return "home_page";
     }
 
 

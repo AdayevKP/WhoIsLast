@@ -12,6 +12,7 @@ public abstract class ErrorCodes {
     public static class Users {
         public static final int USER_EXISTS = 21;
         public static final int USER_DOES_NOT_EXIST = 22;
+        public static final int YOU_ARE_SUPERUSER = 23;
     }
 
     //AUTHORIZATION ERROR CODES
@@ -39,5 +40,6 @@ public abstract class ErrorCodes {
         public static final int ALREADY_IN_QUEUE = 52;
         public static final int PROFESSOR_AND_TIME = 53;
         public static final int PLACE_AND_TIME = 54;
+        public static final int STILL_IN_QUEUE = 55;
     }
 }
