@@ -391,7 +391,7 @@ public class MainController {
         User user = userRepository.findUserByEmail(getCurrentEmail());
         model = setRights(model, user);
         model = setAttributes(model, user);
-        if(user.getPartyId().getSuperuser().getUserId() != user.getUserId())
+        if(!user.getPartyId().getSuperuser().getUserId().equals(user.getUserId()))
             model.addAttribute("error", "Пользователь не является старостой группы");
         else {
             for (String el: map.keySet()){

@@ -30,7 +30,10 @@
     <nav class="navbar navbar-inverse  navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="/home_page">Who Is Last?</a>
+                <a class="navbar-brand" href="/home_page">
+                    <img th:src="@{/styles/modernSpace.png}"
+                         height="40px" valign="middle" alt="Who's last?">
+                </a>
             </div>
             <ul class="nav navbar-nav">
                 <li th:if="${logged}" ><a href="/join_the_queue"><span class="glyphicon glyphicon-list"></span> Очереди</a></li>
