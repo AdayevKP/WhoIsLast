@@ -21,10 +21,22 @@
                             </td>
                         </tr>
                         </thead>
+                        <!--
+                        <tr th:each="queue, iter : ${partyQueues}"
+                            th:onclick="'window.location.href = \'' + @{/queue?id={id}(id=${queue.queueId})} + '\''">
+                            <td th:text="${iter.count}">1</td>
+                            <td th:text="${queue.queueName}">1</td>
+                        </tr>
+                        -->
+
                         <!--/*@thymesVar id="partyQueues" type="java"*/-->
-                        <tr th:each="queue, iter : ${partyQueues}">
-                            <td align="center" th:text="${queue.queueName}">
+                        <tr th:each="queue, iter : ${partyQueues}"
+                            >
+                            <form method="post" action="/queue">
+                            <td align="center" th:text="${queue.queueName}"
+                                th:onclick="'window.location.href = \'' + @{/queue?id={id}(id=${queue.queueId})} + '\''">
                             </td>
+                            </form>
                             <td>
                                 <label>
                                     <input type="checkbox" th:value="${queue.queueId}" th:name="${iter.count}">
@@ -57,7 +69,8 @@
                         <!--/*@thymesVar id="userQueues" type="java"*/-->
                         <tr th:each="queue, iter : ${userQueues}">
                             <!--th:onclick="'window.location.href = \'' + @{/enter_queue?id={id}(id=${queue.queueId})} + '\''"-->
-                            <td align="center" th:if="${queue.queueName != null}" th:text="${queue.queueName}">1</td>
+                            <td align="center" th:if="${queue.queueName != null}" th:text="${queue.queueName}"
+                                th:onclick="'window.location.href = \'' + @{/queue?id={id}(id=${queue.queueId})} + '\''">1</td>
                             <td>
                                 <label>
                                     <input type="checkbox" th:value="${queue.queueId}" th:name="${iter.count}">
