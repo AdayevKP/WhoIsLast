@@ -43,7 +43,7 @@
 
 ## Лицензия
 
-[LICENSE](https://github.com/AleksandraOrova/WhoIsLast/blob/master/LICENSE)
+Этот проект лицецнзирован в соответствии с [MIT License](https://github.com/AleksandraOrova/WhoIsLast/blob/master/LICENSE)
 
 ## Команда разработки
 
