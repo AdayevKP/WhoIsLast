@@ -41,6 +41,10 @@
 * [MySQL](https://dev.mysql.com/downloads/mysql/) - система управления базами данных
 * [IntelliJ IDEA](https://www.jetbrains.com/idea/) - среда разработки программного обеспечения
 
+## Лицензия
+
+[LICENSE](https://github.com/AleksandraOrova/WhoIsLast/blob/master/LICENSE)
+
 ## Команда разработки
 
 Студенты Санкт-Петербургского Политехнического университета Петра Великого кафедры прикладной математики и информатики.
